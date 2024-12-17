@@ -15,14 +15,33 @@
       name: "Rice and Beans",
       description: "Rice and Beans. A classic meal.",
       created_at: 1000000000000,
-      status: "open",
+      status: 'picked up',
     },
     {
       uuid: "a1b2c3d4e5f6",
       name: "Spaghetti Bolognese",
       description: "A hearty Italian pasta dish with a rich meat sauce.",
       created_at: 1000050000001,
-      status: "open",
+      status: 'order placed',
+    },
+  ];
+
+  let closed_meals: MealEntry[] = [
+    {
+      uuid: "g7h8i9j0k1l2",
+      name: "Chicken Curry",
+      description: "A spicy and flavorful chicken curry.",
+      created_at: 1000100000002,
+      status: 'completed',
+      completion_image: "https://random.imagecdn.app/320/569",
+    },
+    {
+      uuid: "m3n4o5p6q7r8",
+      name: "Vegetable Stir Fry",
+      description: "A healthy and colorful vegetable stir fry.",
+      created_at: 1000150000003,
+      status: 'completed',
+      completion_image: "https://random.imagecdn.app/320/569",
     },
   ];
 </script>
@@ -75,6 +94,18 @@
 
     <div class="flex flex-col gap-3 mt-3">
       {#each open_meals as meal_configuration}
+        <MealEntryUI {meal_configuration} />
+      {/each}
+    </div>
+  </section>
+
+  <section class="">
+    <div class="flex justify-between items-center">
+      <h3 class="font-bold text-sm">Completed Donations.</h3>
+    </div>
+
+    <div class="flex flex-col gap-3 mt-3">
+      {#each closed_meals as meal_configuration}
         <MealEntryUI {meal_configuration} />
       {/each}
     </div>
