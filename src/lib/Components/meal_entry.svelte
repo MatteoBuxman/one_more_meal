@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { MealEntry } from "$lib/Types/meal_dashboard";
+  import type { MealEntry } from "$lib/Types/meals";
   import StatusBadge from "./status_badge.svelte";
   let { meal_configuration }: { meal_configuration: MealEntry } = $props();
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { MealEntry } from "$lib/Types/meal_dashboard";
+  import type { MealEntry } from "$lib/Types/meals";
   import MenuPopup from "$lib/Components/menu_popup.svelte";
   import MealEntryUI from "$lib/Components/meal_entry.svelte";
 
@@ -75,7 +75,7 @@
   <section class="">
     <div class="flex justify-between items-center">
       <h3 class="font-bold text-sm">Open Donations.</h3>
-      <button class="btn text-sm font-normal bg-white shadow-none border-none"
+      <a href="/newmeal" class="btn text-sm font-normal bg-white shadow-none border-none"
         ><svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -89,7 +89,7 @@
           />
         </svg>
         New Meal
-      </button>
+    </a>
     </div>
 
     <div class="flex flex-col gap-3 mt-3">

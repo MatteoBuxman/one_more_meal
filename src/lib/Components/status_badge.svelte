@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { MealStatus } from "$lib/Types/meal_dashboard";
+    import type { MealStatus } from "$lib/Types/meals";
     let { status }: { status: MealStatus } = $props();
 </script>
 

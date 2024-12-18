@@ -29,6 +29,7 @@
 		"vite": "^6.0.0"
 	},
 	"dependencies": {
-		"@tailwindcss/container-queries": "^0.1.1"
+		"@tailwindcss/container-queries": "^0.1.1",
+		"jsqr": "^1.4.0"
 	}
 }
