@@ -44,10 +44,13 @@
       .catch(function (err) {
         console.log(err);
       });
+
+      console.log("QR Scanner mounted.");
   });
 
   onDestroy(() => {
     stopCamera();
+    console.log("QR Scanner destroyed.");
   });
 
   function extractURLParamFromURL(url: string): string {
@@ -132,9 +135,6 @@
     </div>
     <canvas bind:this={canvasElement} hidden class="aspect-[10/16] w-72 rounded-lg mx-auto"></canvas>
     <div id="output" bind:this={outputContainer} hidden>
-        
-        <div>
-            <b>Data:</b> <span>{scannedData}</span>
-        </div>
+
     </div>
 </div>

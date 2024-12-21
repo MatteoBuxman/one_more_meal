@@ -1,23 +1,26 @@
 <script lang="ts">
   import MealAddingSelector from "../meal_adding_selector.svelte";
-  import ScanQrcode from "../scan_qr code.svelte";
+  import AddMealInformation from "../add_meal_information.svelte";
+  import type { Meal } from "$lib/Types/meals";
 
-  let modalOpen : boolean = $state(false);
-  let scannedMeals : string[] = $state([]);
+  let flowState: 0 | 1 | 2 = $state(0);
+  let addedMeals: Meal[] = $state([]);
 
   //Modal open
   function handleClick() {
-    modalOpen = true;
-    (document.getElementById('qr_modal') as HTMLDialogElement
-  ).showModal();
+    flowState = 1;
+    (document.getElementById("qr_modal") as HTMLDialogElement).showModal();
   }
 
-  //Modal close
-  function scanSuccess(scanData: string){
-    scannedMeals.push(scanData);
-    modalOpen = false;
-    (document.getElementById('qr_modal') as HTMLDialogElement
-  ).close();
+  //Handle new meal recieved from the add meal flow
+  function addMealHandler(meal: Meal) {
+    addedMeals.push(meal);
+    flowState = 0;
+    (document.getElementById("qr_modal") as HTMLDialogElement).close();
+  }
+
+  function handleContinue() {
+    console.log(addedMeals);
   }
 </script>
 
@@ -28,43 +31,11 @@
     </h2>
     <button class="btn btn-primary" onclick={handleClick}>Open scanner</button>
   </div>
-  <MealAddingSelector/>
+  <MealAddingSelector {addedMeals} />
 </div>
 
-{#each scannedMeals as meal}
-    <h1>{meal}</h1>
-{/each}
+<AddMealInformation {flowState} {addMealHandler} />
 
-<dialog id="qr_modal" class="modal relative font-lexend">
-  <div
-    class="modal-box absolute w-full bottom-0 top-20 rounded-t-lg rounded-b-none"
-  >
-    <button
-      aria-label="Close modal"
-      onclick={() =>
-        (
-          document.getElementById('qr_modal') as HTMLDialogElement
-        ).close()}
-      ><svg
-        class="ml-auto size-6 mb-5"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M6 18 18 6M6 6l12 12"
-        />
-      </svg></button
-    >
-
-    <div class="flex gap-4 w-full items-center p-4">
-        {#if modalOpen}
-            <ScanQrcode {scanSuccess}/>
-        {/if}
-    </div>
-  </div>
-</dialog>
+<div class="flex justify-center p-3">
+    <button class="btn btn-primary" onclick={handleContinue} disabled>Continue</button>
+</div>

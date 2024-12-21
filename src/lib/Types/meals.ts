@@ -16,3 +16,9 @@ export interface MealEntry extends Meal {
     updated_at?: number;
     completion_image?: string;
 };
+
+//The prop type for the add meal flow in the app. It includes a boolean to determine if the modal is open and a function to add a meal to the order.
+export interface AddMealFlowProp {
+    flowState: 0 | 1 | 2;
+    addMealHandler: (meal: Meal) => void;
+}
