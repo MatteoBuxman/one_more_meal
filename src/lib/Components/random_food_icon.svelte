@@ -8,20 +8,20 @@
 </script>
 
 {#if randomFoodIcon === 1}
-  <Drumstick class="size-7 " />
+  <Drumstick class="size-7 shrink-0" />
 {/if}
 {#if randomFoodIcon === 2}
-  <Beef class="size-7 " />
+  <Beef class="size-7 shrink-0" />
 {/if}
 {#if randomFoodIcon === 3}
-  <Ham class="size-7 " />
+  <Ham class="size-7 shrink-0" />
 {/if}
 {#if randomFoodIcon === 4}
-  <Soup class="size-7 " />
+  <Soup class="size-7 shrink-0" />
 {/if}
 {#if randomFoodIcon === 5}
-  <Salad class="size-7 " />
+  <Salad class="size-7 shrink-0" />
 {/if}
 {#if randomFoodIcon === 6}
-  <CookingPot class="size-7 " />
+  <CookingPot class="size-7 shrink-0" />
 {/if}

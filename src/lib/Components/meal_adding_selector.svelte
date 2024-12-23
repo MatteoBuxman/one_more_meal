@@ -1,19 +1,15 @@
 <script lang="ts">
-    import AddedMealCard from "./added_meal_card.svelte";
-    import type { Meal } from "$lib/Types/meals";
+  import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
+  import AddedMealCard from "./added_meal_card.svelte";
+  import { getContext } from "svelte";
 
-    let { addedMeals }: { addedMeals: Meal[] } = $props();
-    
+  let flowState = getContext<OneMoreMealPackagingFlowState>(
+    "add_meal_flow_state"
+  );
 </script>
 
-
-<div class="mt-3 font-lexend">
-    <div class="mb-7">
-        <h2 class="font-light text-sm"> <span class="font-bold">{addedMeals.length}</span> added meals.</h2>
-    </div>
-    <div class="flex flex-col gap-3">
-        {#each addedMeals as meal_configuration}
-            <AddedMealCard {meal_configuration} />
-        {/each}
-    </div>
+<div class="mt-3 font-lexend flex flex-col gap-3">
+  {#each flowState.addedMeals as meal_configuration}
+    <AddedMealCard {meal_configuration} />
+  {/each}
 </div>

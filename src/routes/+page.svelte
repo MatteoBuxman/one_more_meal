@@ -1,6 +1,7 @@
 <script lang="ts">
   import Card from "$lib/Components/home_page_card.svelte";
   import MenuPopup from "$lib/Components/menu_popup.svelte";
+  import { clickOutside } from "$lib/Logic/click_outside.svelte";
 
   const card_information = [
     {
@@ -47,11 +48,15 @@
     // Handle Facebook sign-in logic here
     console.log("Signing in with Facebook");
   };
+
+  function handleClose () {
+    (document.getElementById("sign_in_modal") as HTMLDialogElement).close();
+  };
 </script>
 
 <!-- DaisyUI Modal -->
 <dialog class="modal" id="sign_in_modal">
-  <div class="modal-box">
+  <div class="modal-box" use:clickOutside={handleClose}>
     <h3 class="text-lg font-bold">Sign In</h3>
     <div class="form-control mt-4">
       <label class="label" for="username">
@@ -281,7 +286,7 @@
           .st1 {
             fill: #ffffff;
           }
-        </style><title /><g
+        </style><g
           ><path
             class="st0"
             d="M500,1000L500,1000C223.9,1000,0,776.1,0,500v0C0,223.9,223.9,0,500,0h0c276.1,0,500,223.9,500,500v0   C1000,776.1,776.1,1000,500,1000z"
@@ -325,7 +330,7 @@
           of your own home.
         </h2>
       </div>
-      <button class="btn btn-secondary">I want to help.</button>
+      <a class="btn btn-secondary" href="/dashboard">I want to help.</a>
     </section>
   </div>
   <div class="p-5 font-lexend flex flex-col gap-5">

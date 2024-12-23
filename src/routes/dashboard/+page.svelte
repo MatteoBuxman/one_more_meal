@@ -2,73 +2,97 @@
   import type { MealEntry } from "$lib/Types/meals";
   import MenuPopup from "$lib/Components/menu_popup.svelte";
   import MealEntryUI from "$lib/Components/meal_entry.svelte";
+  import { Home, ChevronDown, ChevronRight, Clock, Plus } from 'lucide-svelte';
 
-  const menu_configuration = [
-    { name: "Home", link: "/" },
-    { name: "About", link: "/about" },
-    { name: "Contact", link: "/contact" },
-  ];
+  let menu_configuration= [
+    
+      {
+        name: 'Profile',
+        href: '/profile',
+      },
+      {
+        name: 'Settings',
+        href: '/settings',
+      },
+      {
+        name: 'Logout',
+        href: '/logout',
+      },
+    
+    ];
 
-  let open_meals: MealEntry[] = [
+  // Sample data remains the same
+  const sampleOrders = [
     {
-      uuid: "h73gdt6389s",
-      name: "Rice and Beans",
-      description: "Rice and Beans. A classic meal.",
-      created_at: 1000000000000,
-      status: 'picked up',
+      id: 'uhud7d7d6dhhhd4',
+      createdAt: '09/09/2001 @ 03:46',
+      status: 'picked_up',
+      meals: [
+        {
+          name: 'Rice and Beans',
+          description: 'A classic meal.',
+          quantity: 2,
+        },
+        {
+          name: 'Spaghetti Bolognese',
+          description: 'A hearty Italian pasta dish with a rich meat sauce.',
+          quantity: 1,
+        }
+      ]
     },
     {
-      uuid: "a1b2c3d4e5f6",
-      name: "Spaghetti Bolognese",
-      description: "A hearty Italian pasta dish with a rich meat sauce.",
-      created_at: 1000050000001,
-      status: 'order placed',
-    },
-  ];
-
-  let closed_meals: MealEntry[] = [
-    {
-      uuid: "g7h8i9j0k1l2",
-      name: "Chicken Curry",
-      description: "A spicy and flavorful chicken curry.",
-      created_at: 1000100000002,
+      id: 'dejihjieu878e6',
+      createdAt: '10/09/2001 @ 07:33',
       status: 'completed',
-      completion_image: "https://random.imagecdn.app/320/569",
-    },
-    {
-      uuid: "m3n4o5p6q7r8",
-      name: "Vegetable Stir Fry",
-      description: "A healthy and colorful vegetable stir fry.",
-      created_at: 1000150000003,
-      status: 'completed',
-      completion_image: "https://random.imagecdn.app/320/569",
-    },
+      meals: [
+        {
+          name: 'Chicken Curry',
+          description: 'A spicy and flavorful chicken curry.',
+          quantity: 1,
+        },
+        {
+          name: 'Vegetable Stir Fry',
+          description: 'A healthy and colorful vegetable stir fry.',
+          quantity: 2,
+        }
+      ]
+    }
   ];
+
+  let expandedOrder: string | null = null;
+
+  function toggleOrder(orderId: string) {
+    expandedOrder = expandedOrder === orderId ? null : orderId;
+  }
+
+  function getStatusStyle(status: string): string {
+    switch (status) {
+      case 'picked_up':
+        return 'bg-emerald-100 text-emerald-700';
+      case 'ordered':
+        return 'bg-gray-100 text-gray-700';
+      case 'completed':
+        return 'bg-blue-100 text-blue-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  }
+
+  function getStatusText(status: string): string {
+    switch (status) {
+      case 'picked_up':
+        return 'Picked up';
+      case 'ordered':
+        return 'Ordered';
+      case 'completed':
+        return 'Completed';
+      default:
+        return status;
+    }
+  }
 </script>
 
-<nav class="flex justify-between items-center font-lexend p-4">
-  <div class="flex gap-3 p-2 items-center">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      class="size-6"
-    >
-      <path
-        d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z"
-      />
-      <path
-        d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z"
-      />
-    </svg>
-
-    <h1 class="text-2xl font-semibold">Hi, Matteo.</h1>
-  </div>
-
-  <MenuPopup {menu_configuration} />
-</nav>
-
-<main class="px-4 font-lexend flex flex-col gap-4">
+<!-- <main class="px-4 font-lexend flex flex-col gap-4">
   <section>
     <h2 class="text-gray-500 text-sm">See your meal donation history below.</h2>
   </section>
@@ -110,4 +134,96 @@
       {/each}
     </div>
   </section>
-</main>
+</main> -->
+
+
+
+<div class="max-w-2xl mx-auto p-4">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center space-x-2">
+      <Home size={24} class="text-gray-700" />
+      <h1 class="text-xl font-semibold">Hi, Matteo.</h1>
+    </div>
+    <button 
+      class="p-2 hover:bg-gray-100 rounded-lg"
+      aria-label="Menu"
+    >
+      <div class="w-6 h-5 flex flex-col justify-between">
+        <div class="w-full h-0.5 bg-gray-600 rounded-full" ></div>
+        <div class="w-full h-0.5 bg-gray-600 rounded-full" ></div>
+        <div class="w-full h-0.5 bg-gray-600 rounded-full" ></div>
+      </div>
+    </button>
+  </div>
+
+  <p class="text-gray-600 mb-6">See your meal donation history below.</p>
+
+  <!-- New Meal Button -->
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold">Open Donations</h2>
+    <a href="/newmeal" class="flex items-center space-x-2 bg-indigo-600 text-white px-2 py-1 rounded-lg hover:bg-indigo-700 transition-colors">
+      <Plus size={16} />
+      <span>New Meal</span>
+    </a>
+  </div>
+
+  <!-- Orders List -->
+  <div class="space-y-4">
+    {#each sampleOrders as order}
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <button 
+          on:click={() => toggleOrder(order.id)}
+          class="w-full text-left p-4 hover:bg-gray-50 transition-colors"
+        >
+          <div class="flex justify-between items-start">
+            <div class="space-y-2">
+              <div class="flex items-center space-x-3">
+                <Clock size={20} class="text-gray-400" />
+                <span class="text-sm text-gray-500">{order.createdAt}</span>
+              </div>
+              <div>
+                <h3 class="text-sm font-semibold">Order #{order.id}</h3>
+                <p class="text-sm text-gray-600">
+                  {order.meals.reduce((acc, meal) => acc + meal.quantity, 0)} meals
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-3">
+              <span class="px-3 py-1 rounded-full text-sm {getStatusStyle(order.status)}">
+                {getStatusText(order.status)}
+              </span>
+              {#if expandedOrder === order.id}
+                <ChevronDown size={20} class="text-gray-400" />
+              {:else}
+                <ChevronRight size={20} class="text-gray-400" />
+              {/if}
+            </div>
+          </div>
+        </button>
+        
+        {#if expandedOrder === order.id}
+          <div class="border-t border-gray-200 p-4 bg-gray-50">
+            <div class="space-y-4">
+              {#each order.meals as meal}
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                      <span class="text-red-600">🍱</span>
+                    </div>
+                    <div>
+                      <h4 class="font-medium">{meal.name}</h4>
+                      <p class="text-sm text-gray-600">{meal.description}</p>
+                    </div>
+                  </div>
+                  <span class="text-sm text-gray-500">x{meal.quantity}</span>
+                </div>
+              {/each}
+            </div>
+          </div>
+        {/if}
+      </div>
+    {/each}
+  </div>
+</div>
+

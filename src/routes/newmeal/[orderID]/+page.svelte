@@ -5,16 +5,35 @@
     Clock,
     ChevronRight,
     CreditCard,
-    Drumstick,
     Pencil,
   } from "lucide-svelte";
-  import type { PageData } from "./$types";
+  
   import RandomFoodIcon from "$lib/Components/random_food_icon.svelte";
+
+  import { page } from "$app/stores";
+  import type { Meal } from "$lib/Types/meals";
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
 
   let userName = "Matteo Buxman";
   let userPhone = "082 611 0091";
 
-  let { data }: { data: PageData } = $props();
+  let addedMeals : Meal[] = [];
+  let orderID : string;
+
+  onMount(()=>{
+    orderID = $page.params.orderID;
+    addedMeals = JSON.parse(sessionStorage.getItem('addedMeals') || '[]');
+  })
+
+  function handleReturn(){
+    goto(`/newmeal`);
+  }
+
+  function handleComplete(){
+    sessionStorage.removeItem('addedMeals');
+    goto(`/newmeal/${orderID}/confirmed`);
+  }
 </script>
 
 <div>
@@ -23,12 +42,13 @@
     class="p-3 flex items-center justify-between bg-white/80 backdrop-blur-sm sticky top-0 z-10"
   >
     <div class="flex items-center space-x-4">
-      <button class="hover:bg-gray-100 p-2 rounded-full transition-colors">
+      <button onclick={handleReturn} class="hover:bg-gray-100 p-2 rounded-full transition-colors">
         <ArrowLeft class="w-5 h-5" />
       </button>
       <h1 class="text-xl font-bold">Complete Pickup</h1>
     </div>
   </div>
+
 
   <!-- New Contact Information Section -->
   <div class="px-4 mt-6">
@@ -55,7 +75,7 @@
   </div>
 
   <!-- Store Info Card -->
-  <div class="mx-4 mt-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+  <div class="mx-4 mt-6 bg-white rounded-b-2xl shadow-lg border border-gray-100">
     <div class="bg-gray-100">
       <iframe
         class="w-full h-64"
@@ -120,9 +140,12 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
       <h2 class="text-lg font-bold mb-4">Order Summary</h2>
       <div class="flex flex-col gap-3">
-        {#each data.meals as meal}
+        {#if addedMeals.length === 0}
+          <p class="text-gray-500">No meals added</p>
+        {/if}
+        {#each addedMeals as meal}
           <div class="flex items-center gap-4 pb-4">
-            <div class=" bg-gray-100 rounded-lg">
+            <div class=" bg-gray-100 rounded-full flex items-center justify-center size-12">
               <RandomFoodIcon />
             </div>
             <div class="flex-1">
@@ -156,9 +179,10 @@
     </div>
 
     <button
+    onclick={handleComplete}
       class="w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-medium shadow-sm transition-all active:scale-[0.98]"
     >
-      Complete Order
+      Complete Pickup Request
     </button>
 
     <div
@@ -169,3 +193,7 @@
     </div>
   </div>
 </div>
+
+<style>
+  
+</style>

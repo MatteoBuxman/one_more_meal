@@ -1,43 +1,50 @@
 <script lang="ts">
   import ScanQrcode from "./scan_qr code.svelte";
-  import type { Meal } from "$lib/Types/meals";
   import EnterMealInformation from "./enter_meal_information.svelte";
+  import { getContext } from "svelte";
+  import type { Meal, OneMoreMealPackagingFlowState } from "$lib/Types/meals";
+  import { clickOutside } from "$lib/Logic/click_outside.svelte";
 
-  type AddMealFlowProp = {
-    flowState: number;
-    addMealHandler: (meal: Meal) => void;
-  };
+  let flowState = getContext<OneMoreMealPackagingFlowState>(
+    "add_meal_flow_state"
+  );
 
-  let { flowState, addMealHandler }: AddMealFlowProp = $props();
-  let mealInformation: Meal = $state({
-    uuid: "",
-    name: "",
-  });
+  let modal: HTMLDialogElement;
 
-  //Handler for successful QR scan
-  function scanSuccess(rndString: string) {
-    flowState = 2;
-    mealInformation.uuid = rndString;
-  }
+  //   let { flowState, addMealHandler } = $props();
+  let mealuuid: string = $state("");
 
   function handlePrematureClose() {
-    (document.getElementById("qr_modal") as HTMLDialogElement).close()
+    flowState.stateIndex = 0;
   }
+
+  function scanSuccess(uuid: string) {
+    mealuuid = uuid;
+    flowState.stateIndex = 2;
+  }
+
+  $effect(() => {
+    if (flowState.stateIndex == 1) {
+      modal.showModal();
+    } else if (flowState.stateIndex == 0) {
+      modal.close();
+    }
+  });
 </script>
 
-<dialog id="qr_modal" class="modal relative font-lexend">
+<dialog id="qr_modal" class="modal relative font-lexend" bind:this={modal}>
   <div
     class="modal-box absolute w-full bottom-0 top-20 rounded-t-lg rounded-b-none"
   >
     <div class="flex justify-between items-center">
       <ul class="steps">
         <li class="step step-primary text-sm">Scan QR</li>
-        <li class="step text-sm {flowState === 2 && 'step-primary'}">Meal Information</li>
+        <li class="step text-sm {flowState.stateIndex === 2 && 'step-primary'}">
+          Meal Information
+        </li>
       </ul>
 
-      <button
-        aria-label="Close modal"
-        onclick={handlePrematureClose}
+      <button aria-label="Close modal" onclick={handlePrematureClose}
         ><svg
           class="ml-auto size-6 mb-5"
           xmlns="http://www.w3.org/2000/svg"
@@ -54,10 +61,10 @@
         </svg></button
       >
     </div>
-    {#if flowState === 1}
+    {#if flowState.stateIndex === 1}
       <ScanQrcode {scanSuccess} />
-    {:else if flowState === 2}
-      <EnterMealInformation uuid={mealInformation.uuid} {addMealHandler}/>
+    {:else if flowState.stateIndex === 2}
+      <EnterMealInformation uuid={mealuuid} />
     {:else}
       <h1>An error occurred while adding your meal</h1>
     {/if}

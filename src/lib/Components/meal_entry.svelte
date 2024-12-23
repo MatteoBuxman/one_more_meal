@@ -135,7 +135,7 @@
         <StatusBadge status={meal_configuration.status} />
     </div>
     <div class="mt-5">
-        <a href="#" class="link font-light text-sm">Contact us with regards to this meal.</a>
+        <a href="/" class="link font-light text-sm">Contact us with regards to this meal.</a>
     </div>
     <div class="flex items-center justify-center mt-10">
         {#if meal_configuration.completion_image}

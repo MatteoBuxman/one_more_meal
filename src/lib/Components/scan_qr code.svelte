@@ -34,9 +34,9 @@
     // Use facingMode: environment to attemt to get the front camera on phones
     navigator.mediaDevices
       .getUserMedia({ video: { facingMode: "environment" } })
-      .then(function (stream) {
-        stream = stream;
-        video.srcObject = stream;
+      .then(function (streamT) {
+        stream = streamT;
+        video.srcObject = streamT;
         video.setAttribute("playsinline", "true"); // required to tell iOS safari we don't want fullscreen
         video.play();
         requestAnimationFrame(tick);
@@ -44,13 +44,10 @@
       .catch(function (err) {
         console.log(err);
       });
-
-      console.log("QR Scanner mounted.");
   });
 
   onDestroy(() => {
     stopCamera();
-    console.log("QR Scanner destroyed.");
   });
 
   function extractURLParamFromURL(url: string): string {
@@ -123,7 +120,7 @@
     if (stream) {
       // Stop all tracks
       stream.getTracks().forEach((track) => track.stop());
-      console.log("Camera stopped.");
+  
     }
   }
 </script>
