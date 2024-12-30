@@ -2,8 +2,7 @@
   import ScanQrcode from "./scan_qr code.svelte";
   import EnterMealInformation from "./enter_meal_information.svelte";
   import { getContext } from "svelte";
-  import type { Meal, OneMoreMealPackagingFlowState } from "$lib/Types/meals";
-  import { clickOutside } from "$lib/Logic/click_outside.svelte";
+  import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
 
   let flowState = getContext<OneMoreMealPackagingFlowState>(
     "add_meal_flow_state"

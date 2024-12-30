@@ -2,11 +2,23 @@
   import type { Meal } from "$lib/Types/meals";
   import { ChevronRight } from "lucide-svelte";
   import RandomFoodIcon from "./random_food_icon.svelte";
+  import EditMealInfo from "./edit_meal_info.svelte";
 
   let { meal_configuration }: { meal_configuration: Meal } = $props();
+
+  let open = $state<boolean>(false);
+
+  function handleOpen() {
+    open = true;
+  }
+
+  function handleClose() {
+    open = false;
+  }
+
 </script>
 
-<div class="card p-4 hover:bg-gray-50">
+<div class="card p-4 hover:bg-gray-50" onclick={handleOpen}>
   <div class="flex items-center justify-between">
     <div class="flex items-center space-x-4">
       <div
@@ -27,6 +39,8 @@
     <ChevronRight class="text-gray-400 shrink-0" />
   </div>
 </div>
+
+<EditMealInfo {open} {meal_configuration} {handleClose} />
 
 <style>
   .card {

@@ -24,6 +24,18 @@
   onMount(()=>{
     orderID = $page.params.orderID;
     addedMeals = JSON.parse(sessionStorage.getItem('addedMeals') || '[]');
+
+    const inSessionMeals = JSON.parse(sessionStorage.getItem("addedMeals") || "[]");
+    //Quite a hack of a solution to deal with the state where there is no "addedMeals" in session storage.
+    const expiryTime = inSessionMeals.expiryTime || Date.now() - 100;
+
+    //Check if the added meals are still valid
+    if (expiryTime < Date.now()) {
+      addedMeals = [];
+    } else {
+      addedMeals = inSessionMeals.addedMeals;
+    }
+
   })
 
   function handleReturn(){
