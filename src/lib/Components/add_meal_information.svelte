@@ -29,6 +29,7 @@
       modal.close();
     }
   });
+
 </script>
 
 <dialog id="qr_modal" class="modal relative font-lexend" bind:this={modal}>

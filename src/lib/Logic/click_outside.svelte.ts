@@ -7,12 +7,11 @@ export function clickOutside(node: HTMLElement, func: () => void){
                 func();
             }
         }
-        console.log("Added")
+        
         document.addEventListener('click', internalFunc, true)
 
         return () => {
             document.removeEventListener('click', internalFunc, true)
-            console.log("Removed")
         }
     });
 }

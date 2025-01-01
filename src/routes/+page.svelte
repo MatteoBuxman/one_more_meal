@@ -1,7 +1,10 @@
 <script lang="ts">
   import Card from "$lib/Components/home_page_card.svelte";
   import MenuPopup from "$lib/Components/menu_popup.svelte";
+  import { useFirestore } from "$lib/Firebase/firebase_init";
   import { clickOutside } from "$lib/Logic/click_outside.svelte";
+  import { addDoc, collection } from "firebase/firestore";
+  import { onMount } from "svelte";
 
   const card_information = [
     {
@@ -52,6 +55,8 @@
   function handleClose () {
     (document.getElementById("sign_in_modal") as HTMLDialogElement).close();
   };
+
+  
 </script>
 
 <!-- DaisyUI Modal -->

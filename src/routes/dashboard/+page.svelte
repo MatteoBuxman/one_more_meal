@@ -1,8 +1,6 @@
 <script lang="ts">
-  import type { MealEntry } from "$lib/Types/meals";
-  import MenuPopup from "$lib/Components/menu_popup.svelte";
-  import MealEntryUI from "$lib/Components/meal_entry.svelte";
-  import { Home, ChevronDown, ChevronRight, Clock, Plus } from 'lucide-svelte';
+  import { Home, ChevronDown, ChevronRight, Clock, Plus, Menu } from 'lucide-svelte';
+  import MenuPopup from '$lib/Components/menu_popup.svelte';
 
   let menu_configuration= [
     
@@ -145,16 +143,7 @@
       <Home size={24} class="text-gray-700" />
       <h1 class="text-xl font-semibold">Hi, Matteo.</h1>
     </div>
-    <button 
-      class="p-2 hover:bg-gray-100 rounded-lg"
-      aria-label="Menu"
-    >
-      <div class="w-6 h-5 flex flex-col justify-between">
-        <div class="w-full h-0.5 bg-gray-600 rounded-full" ></div>
-        <div class="w-full h-0.5 bg-gray-600 rounded-full" ></div>
-        <div class="w-full h-0.5 bg-gray-600 rounded-full" ></div>
-      </div>
-    </button>
+    <MenuPopup {menu_configuration} />
   </div>
 
   <p class="text-gray-600 mb-6">See your meal donation history below.</p>

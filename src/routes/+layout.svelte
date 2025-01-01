@@ -1,6 +1,10 @@
 <script lang="ts">
-	import '../app.css';
-	let { children } = $props();
+  import ContextProvider from "$lib/Components/context_provider.svelte";
+  import { firebaseContext } from "../hooks.client";
+  import "../app.css";
+  let { children } = $props();
 </script>
 
-{@render children()}
+<ContextProvider contextValues={firebaseContext}>
+  {@render children()}
+</ContextProvider>

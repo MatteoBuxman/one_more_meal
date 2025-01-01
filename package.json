@@ -30,6 +30,8 @@
 	},
 	"dependencies": {
 		"@tailwindcss/container-queries": "^0.1.1",
+		"firebase": "^10.14.1",
+		"firebaseui": "^6.1.0",
 		"jsqr": "^1.4.0",
 		"lucide-svelte": "^0.469.0"
 	}
