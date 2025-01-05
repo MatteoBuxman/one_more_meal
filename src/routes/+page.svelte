@@ -1,10 +1,6 @@
 <script lang="ts">
   import Card from "$lib/Components/home_page_card.svelte";
   import MenuPopup from "$lib/Components/menu_popup.svelte";
-  import { useFirestore } from "$lib/Firebase/firebase_init";
-  import { clickOutside } from "$lib/Logic/click_outside.svelte";
-  import { addDoc, collection } from "firebase/firestore";
-  import { onMount } from "svelte";
 
   const card_information = [
     {
@@ -61,7 +57,7 @@
 
 <!-- DaisyUI Modal -->
 <dialog class="modal" id="sign_in_modal">
-  <div class="modal-box" use:clickOutside={handleClose}>
+  <div class="modal-box">
     <h3 class="text-lg font-bold">Sign In</h3>
     <div class="form-control mt-4">
       <label class="label" for="username">
@@ -314,7 +310,7 @@
 </dialog>
 
 <div>
-  <nav class="navbar p-4">
+  <nav class="navbar p-4" >
     <div class="flex-1">
       <img src="/main_logo_pinkaccent.png" alt="logo_image" class="w-7" />
       <a class="text-xl font-lexend p-3" aria-label="home_link" href="/"

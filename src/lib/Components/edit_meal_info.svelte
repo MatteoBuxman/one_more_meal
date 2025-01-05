@@ -1,18 +1,17 @@
 <script lang="ts">
   import type { Meal, OneMoreMealPackagingFlowState } from "$lib/Types/meals";
   import { getContext } from "svelte";
-
-  let modal: HTMLDialogElement;
+  import ModalPopupMobile from "./modal_popup_mobile.svelte";
 
   const contextState = getContext<OneMoreMealPackagingFlowState>(
     "add_meal_flow_state"
   );
 
   let {
-    open,
+    isOpen = $bindable(),
     meal_configuration,
     handleClose,
-  }: { open: boolean; meal_configuration: Meal; handleClose: () => void } =
+  }: {  isOpen: boolean, meal_configuration: Meal; handleClose: () => void } =
     $props();
 
   let hasChanged = $state<boolean>(false);
@@ -20,13 +19,13 @@
   //Local variables to allow for resetting
   let localName = $state(meal_configuration.name);
   let localDescription = $state(meal_configuration.description);
-  let localAmount = $state(meal_configuration.amount);
+  let localAmount = $state(meal_configuration.quantity);
 
   // Reset function
   function resetForm() {
     localName = meal_configuration.name;
     localDescription = meal_configuration.description;
-    localAmount = meal_configuration.amount;
+    localAmount = meal_configuration.quantity;
   }
 
   function markHasChanged() {
@@ -57,7 +56,7 @@
 
     meal.name = localName;
     meal.description = localDescription;
-    meal.amount = localAmount;
+    meal.quantity = localAmount;
 
     handleClose();
   }
@@ -70,48 +69,20 @@
     handleClose();
   }
 
-  $effect(() => {
-    if (open) {
-      modal.showModal();
-    } else {
-      modal.close();
-    }
-  });
 </script>
 
-<dialog class="modal relative font-lexend" bind:this={modal}>
-  <div
-    class="modal-box absolute w-full bottom-0 top-20 rounded-t-lg rounded-b-none"
-  >
-    <div class="flex justify-end items-center">
-      <button aria-label="Close modal" onclick={exitClose}
-        ><svg
-          class="ml-auto size-6"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M6 18 18 6M6 6l12 12"
-          />
-        </svg></button
+<ModalPopupMobile bind:isOpen onClose={exitClose}>
+  <div class="space-y-6 mt-6">
+    <div class="inline-block px-4 py-2 bg-gray-100 rounded-full">
+      <span class="text-sm text-gray-600"
+        >Meal ID: {meal_configuration.uuid}</span
       >
     </div>
 
-    <div class="space-y-6 mt-6">
-      <div class="inline-block px-4 py-2 bg-gray-100 rounded-full">
-        <span class="text-sm text-gray-600"
-          >Meal ID: {meal_configuration.uuid}</span
-        >
-      </div>
-
-      <form onsubmit={handleUpdate} class="space-y-6">
-        <div class="space-y-2">
-          <label class="text-lg font-medium text-gray-700">Meal Name</label>
+    <form onsubmit={handleUpdate} class="space-y-6">
+      <div class="space-y-2">
+        <label class="font-medium text-gray-700"
+          >Meal Name
           <input
             onkeydown={markHasChanged}
             type="text"
@@ -120,44 +91,44 @@
             placeholder="Enter the meal name"
             required
           />
-        </div>
+        </label>
+      </div>
 
-        <div class="space-y-2">
-          <label class="text-lg font-medium text-gray-700"
-            >Description (Optional)</label
-          >
+      <div class="space-y-2">
+        <label class="font-medium text-gray-700"
+          >Description (Optional)
           <textarea
             onkeydown={markHasChanged}
             bind:value={localDescription}
-            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="text-sm w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Add a description"
             rows="4"
           ></textarea>
-        </div>
+        </label>
+      </div>
 
-        <div class="space-y-2">
-          <label class="text-lg font-medium text-gray-700"
-            >Amount of Meals</label
-          >
+      <div class="space-y-2">
+        <label class="font-medium text-gray-700"
+          >Amount of Meals
           <input
             onkeydown={markHasChanged}
             type="number"
             bind:value={localAmount}
             class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-        </div>
+        </label>
+      </div>
 
-        <button
-          type="submit"
-          class="w-full py-3 text-white font-medium rounded-lg transition-colors"
-          class:bg-red-500={!hasChanged}
-          class:bg-red-600={!hasChanged && ':hover'}
-          class:bg-indigo-600={hasChanged}
-          class:bg-indigo-700={hasChanged && ':hover'}
-        >
-          {hasChanged ? "Save Changes" : "Delete Meal"}
-        </button>
-      </form>
-    </div>
+      <button
+        type="submit"
+        class="w-full py-3 text-white font-medium rounded-lg transition-colors"
+        class:bg-red-500={!hasChanged}
+        class:bg-red-600={!hasChanged && ":hover"}
+        class:bg-indigo-600={hasChanged}
+        class:bg-indigo-700={hasChanged && ":hover"}
+      >
+        {hasChanged ? "Save Changes" : "Delete Meal"}
+      </button>
+    </form>
   </div>
-</dialog>
+</ModalPopupMobile>

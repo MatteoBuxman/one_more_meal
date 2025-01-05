@@ -71,7 +71,9 @@
   <MenuPopup {menu_configuration} />
 </nav>
 
+
 <div class="max-w-md mx-auto p-4 space-y-6">
+  <p class="text-sm text-gray-500">Click below if your QR codes are already on your packaging.</p>
   <!-- Main Content -->
   <div class="space-y-4">
     <button
@@ -92,6 +94,8 @@
         </p>
       </div>
     </button>
+
+    <p class="text-sm text-gray-500">Click below if you need to get your meal QR codes.</p>
 
     <button
       type="button"

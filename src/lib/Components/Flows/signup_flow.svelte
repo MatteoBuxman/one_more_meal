@@ -38,35 +38,35 @@
           <div class="form-control">
             <label class="label">
               <span class="label-text">Email</span>
+              <input
+                type="email"
+                bind:value={formData.email}
+                class="input input-bordered"
+                placeholder="Enter your email"
+              />
             </label>
-            <input
-              type="email"
-              bind:value={formData.email}
-              class="input input-bordered"
-              placeholder="Enter your email"
-            />
           </div>
           <div class="form-control">
             <label class="label">
               <span class="label-text">Password</span>
+              <input
+                type="password"
+                bind:value={formData.password}
+                class="input input-bordered"
+                placeholder="Enter your password"
+              />
             </label>
-            <input
-              type="password"
-              bind:value={formData.password}
-              class="input input-bordered"
-              placeholder="Enter your password"
-            />
           </div>
           <div class="form-control">
             <label class="label">
               <span class="label-text">Confirm Password</span>
+              <input
+                type="password"
+                bind:value={formData.confirmPassword}
+                class="input input-bordered"
+                placeholder="Confirm your password"
+              />
             </label>
-            <input
-              type="password"
-              bind:value={formData.confirmPassword}
-              class="input input-bordered"
-              placeholder="Confirm your password"
-            />
           </div>
         </div>
       {:else if step === 2}
@@ -75,24 +75,24 @@
           <div class="form-control">
             <label class="label">
               <span class="label-text">First Name</span>
+              <input
+                type="text"
+                bind:value={formData.firstName}
+                class="input input-bordered"
+                placeholder="Enter your first name"
+              />
             </label>
-            <input
-              type="text"
-              bind:value={formData.firstName}
-              class="input input-bordered"
-              placeholder="Enter your first name"
-            />
           </div>
           <div class="form-control">
             <label class="label">
               <span class="label-text">Last Name</span>
+              <input
+                type="text"
+                bind:value={formData.lastName}
+                class="input input-bordered"
+                placeholder="Enter your last name"
+              />
             </label>
-            <input
-              type="text"
-              bind:value={formData.lastName}
-              class="input input-bordered"
-              placeholder="Enter your last name"
-            />
           </div>
         </div>
       {:else if step === 3}
@@ -107,48 +107,48 @@
           <div class="form-control">
             <label class="label">
               <span class="label-text">Address</span>
+              <input
+                type="text"
+                bind:value={formData.address}
+                class="input input-bordered"
+                placeholder="Enter your address"
+              />
             </label>
-            <input
-              type="text"
-              bind:value={formData.address}
-              class="input input-bordered"
-              placeholder="Enter your address"
-            />
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="form-control">
               <label class="label">
                 <span class="label-text">City</span>
+                <input
+                  type="text"
+                  bind:value={formData.city}
+                  class="input input-bordered"
+                  placeholder="City"
+                />
               </label>
-              <input
-                type="text"
-                bind:value={formData.city}
-                class="input input-bordered"
-                placeholder="City"
-              />
             </div>
             <div class="form-control">
               <label class="label">
                 <span class="label-text">State</span>
+                <input
+                  type="text"
+                  bind:value={formData.state}
+                  class="input input-bordered"
+                  placeholder="State"
+                />
               </label>
-              <input
-                type="text"
-                bind:value={formData.state}
-                class="input input-bordered"
-                placeholder="State"
-              />
             </div>
           </div>
           <div class="form-control">
             <label class="label">
               <span class="label-text">ZIP Code</span>
+              <input
+                type="text"
+                bind:value={formData.zipCode}
+                class="input input-bordered"
+                placeholder="ZIP Code"
+              />
             </label>
-            <input
-              type="text"
-              bind:value={formData.zipCode}
-              class="input input-bordered"
-              placeholder="ZIP Code"
-            />
           </div>
         </div>
       {:else if step === 4}
@@ -157,36 +157,36 @@
           <div class="form-control">
             <label class="label">
               <span class="label-text">Card Number</span>
+              <input
+                type="text"
+                bind:value={formData.cardNumber}
+                class="input input-bordered"
+                placeholder="Enter your card number"
+              />
             </label>
-            <input
-              type="text"
-              bind:value={formData.cardNumber}
-              class="input input-bordered"
-              placeholder="Enter your card number"
-            />
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="form-control">
               <label class="label">
                 <span class="label-text">Expiry Date</span>
+                <input
+                  type="text"
+                  bind:value={formData.expiryDate}
+                  class="input input-bordered"
+                  placeholder="MM/YY"
+                />
               </label>
-              <input
-                type="text"
-                bind:value={formData.expiryDate}
-                class="input input-bordered"
-                placeholder="MM/YY"
-              />
             </div>
             <div class="form-control">
               <label class="label">
                 <span class="label-text">CVV</span>
+                <input
+                  type="text"
+                  bind:value={formData.cvv}
+                  class="input input-bordered"
+                  placeholder="CVV"
+                />
               </label>
-              <input
-                type="text"
-                bind:value={formData.cvv}
-                class="input input-bordered"
-                placeholder="CVV"
-              />
             </div>
           </div>
         </div>
@@ -195,12 +195,12 @@
       <!-- Navigation Buttons -->
       <div class="mt-6 flex gap-4">
         {#if step > 1}
-          <button on:click={() => step--} class="btn btn-outline flex-1">
+          <button onclick={() => step--} class="btn btn-outline flex-1">
             Back
           </button>
         {/if}
         <button
-          on:click={() => (step < 4 ? step++ : handleSubmit())}
+          onclick={() => (step < 4 ? step++ : handleSubmit())}
           class="btn btn-primary flex-1"
         >
           {step === 4 ? "Create Account" : "Next"}

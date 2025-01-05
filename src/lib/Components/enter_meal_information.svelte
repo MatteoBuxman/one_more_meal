@@ -12,7 +12,7 @@
     uuid,
     name: "",
     description: "",
-    amount: 1,
+    quantity: 1,
   });
 
   function handleAddMeal(event: Event) {
@@ -72,10 +72,10 @@
         type="number"
         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
         min="1"
-        bind:value={mealData.amount}
+        bind:value={mealData.quantity}
         required
       />
-      {#if mealData.amount > 1}
+      {#if mealData.quantity > 1}
         <p class="text-xs mt-2 text-gray-500">
           You will be required to scan the QR codes of the additional meals.
         </p>
@@ -87,6 +87,6 @@
     type="submit"
     class="w-full py-2 px-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
   >
-    Add {mealData.amount > 1 ? "Meals" : "Meal"}
+    Add {mealData.quantity > 1 ? "Meals" : "Meal"}
   </button>
 </form>

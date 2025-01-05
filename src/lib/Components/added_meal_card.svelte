@@ -6,14 +6,14 @@
 
   let { meal_configuration }: { meal_configuration: Meal } = $props();
 
-  let open = $state<boolean>(false);
+  let isOpen = $state<boolean>(false);
 
   function handleOpen() {
-    open = true;
+    isOpen = true;
   }
 
   function handleClose() {
-    open = false;
+    isOpen = false;
   }
 
 </script>
@@ -40,7 +40,7 @@
   </div>
 </div>
 
-<EditMealInfo {open} {meal_configuration} {handleClose} />
+<EditMealInfo bind:isOpen {meal_configuration} {handleClose} />
 
 <style>
   .card {
