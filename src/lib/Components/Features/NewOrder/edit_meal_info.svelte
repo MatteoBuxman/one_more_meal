@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Meal, OneMoreMealPackagingFlowState } from "$lib/Types/meals";
   import { getContext } from "svelte";
-  import ModalPopupMobile from "./modal_popup_mobile.svelte";
+  import ModalPopupMobile from "../Utilities/modal_popup_mobile.svelte";
 
   const contextState = getContext<OneMoreMealPackagingFlowState>(
     "add_meal_flow_state"
@@ -11,8 +11,11 @@
     isOpen = $bindable(),
     meal_configuration,
     handleClose,
-  }: {  isOpen: boolean, meal_configuration: Meal; handleClose: () => void } =
-    $props();
+  }: {
+    isOpen: boolean;
+    meal_configuration: Meal;
+    handleClose: () => void;
+  } = $props();
 
   let hasChanged = $state<boolean>(false);
 
@@ -68,15 +71,20 @@
     contextState.addedMeals.splice(index, 1);
     handleClose();
   }
-
 </script>
 
 <ModalPopupMobile bind:isOpen onClose={exitClose}>
-  <div class="space-y-6 mt-6">
-    <div class="inline-block px-4 py-2 bg-gray-100 rounded-full">
-      <span class="text-sm text-gray-600"
-        >Meal ID: {meal_configuration.uuid}</span
-      >
+  <div class="space-y-4 mt-6 px-5">
+    <h1 class="font-bold text-xl">Edit.</h1>
+    <div class="flex flex-col gap-2">
+      <h2 class="text-sm">Meal IDs</h2>
+      <div class="grid grid-cols-3 gap-2">
+        {#each meal_configuration.uuid as uuid}
+          <span class="badge badge-primary text-xs">
+            {uuid}
+          </span>
+        {/each}
+      </div>
     </div>
 
     <form onsubmit={handleUpdate} class="space-y-6">
@@ -108,15 +116,7 @@
       </div>
 
       <div class="space-y-2">
-        <label class="font-medium text-gray-700"
-          >Amount of Meals
-          <input
-            onkeydown={markHasChanged}
-            type="number"
-            bind:value={localAmount}
-            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </label>
+        <p class="text-sm">{localAmount} meals.</p>
       </div>
 
       <button
@@ -127,7 +127,7 @@
         class:bg-indigo-600={hasChanged}
         class:bg-indigo-700={hasChanged && ":hover"}
       >
-        {hasChanged ? "Save Changes" : "Delete Meal"}
+        {hasChanged ? "Save Changes" : "Delete"}
       </button>
     </form>
   </div>

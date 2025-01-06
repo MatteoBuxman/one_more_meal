@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Meal } from "$lib/Types/meals";
   import { ChevronRight } from "lucide-svelte";
-  import RandomFoodIcon from "./random_food_icon.svelte";
+  import RandomFoodIcon from "../Utilities/random_food_icon.svelte";
   import EditMealInfo from "./edit_meal_info.svelte";
 
   let { meal_configuration }: { meal_configuration: Meal } = $props();
@@ -18,8 +18,8 @@
 
 </script>
 
-<div class="card p-4 hover:bg-gray-50" onclick={handleOpen}>
-  <div class="flex items-center justify-between">
+<button class="card p-4 hover:bg-gray-50 w-full text-left" onclick={handleOpen}>
+  <div class="flex items-center justify-between w-full">
     <div class="flex items-center space-x-4">
       <div
         class="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0"
@@ -31,14 +31,14 @@
           <h3 class=" text-gray-900 text-sm font-bold">
             {meal_configuration.name}
           </h3>
-          <span class="text-xs text-gray-400">{meal_configuration.uuid}</span>
+          <span class="text-xs text-gray-400">{meal_configuration.uuid[0]}</span>
         </div>
         <p class="text-sm text-gray-600">{meal_configuration.description}</p>
       </div>
     </div>
     <ChevronRight class="text-gray-400 shrink-0" />
   </div>
-</div>
+</button>
 
 <EditMealInfo bind:isOpen {meal_configuration} {handleClose} />
 

@@ -116,18 +116,17 @@
   }
 
   function pauseScanningAfterQRCode() {
-
     setTimeout(() => {
       const rndParam = extractParamsFromURL(scannedData);
       if (rndParam) {
-        scanSuccess(rndParam);
-      }
-      else{
-        scanState = 1;
-        requestAnimationFrame(tick);
+        //Scansuccess returns a bool which determines whether the scanner should continue scanning
+        const continueBool = scanSuccess(rndParam);
+        if (continueBool) {
+          requestAnimationFrame(tick);
+          scanState = 1;
+        }
       }
     }, 2500);
-
   }
 
   function extractParamsFromURL(url: string) {
@@ -140,7 +139,9 @@
   <div class="fixed inset-0 bg-white -z-10">
     <div class="relative h-full w-full">
       <!-- Scanner Viewport -->
-      <div class="absolute inset-0 flex flex-col gap-4 items-center justify-center ">
+      <div
+        class="absolute inset-0 flex flex-col gap-4 items-center justify-center"
+      >
         {#if scanState === 0}
           <div class="flex items-center space-x-2 text-black">
             <Camera size={24} />
@@ -172,21 +173,35 @@
 
           <!-- Corner markers -->
           <div
-            class="absolute top-0 left-0 w-16 h-16 border-l-4 border-t-4 {scanState === 2 ? 'border-green-400': 'border-black'}"
+            class="absolute top-0 left-0 w-16 h-16 border-l-4 border-t-4 {scanState ===
+            2
+              ? 'border-green-400'
+              : 'border-black'}"
           ></div>
           <div
-            class="absolute top-0 right-0 w-16 h-16 border-r-4 border-t-4 {scanState === 2 ? 'border-green-400': 'border-black'}"
+            class="absolute top-0 right-0 w-16 h-16 border-r-4 border-t-4 {scanState ===
+            2
+              ? 'border-green-400'
+              : 'border-black'}"
           ></div>
           <div
-            class="absolute bottom-0 left-0 w-16 h-16 border-l-4 border-b-4 {scanState === 2 ? 'border-green-400': 'border-black'}"
+            class="absolute bottom-0 left-0 w-16 h-16 border-l-4 border-b-4 {scanState ===
+            2
+              ? 'border-green-400'
+              : 'border-black'}"
           ></div>
           <div
-            class="absolute bottom-0 right-0 w-16 h-16 border-r-4 border-b-4 {scanState === 2 ? 'border-green-400': 'border-black'}"
+            class="absolute bottom-0 right-0 w-16 h-16 border-r-4 border-b-4 {scanState ===
+            2
+              ? 'border-green-400'
+              : 'border-black'}"
           ></div>
 
           <!-- Scanning animation -->
           <div
-            class="absolute top-0 left-0 right-0 h-1 {scanState === 2 ? 'border-green-400': 'border-black'}  animate-scan"
+            class="absolute top-0 left-0 right-0 h-1 {scanState === 2
+              ? 'border-green-400'
+              : 'border-black'}  animate-scan"
           ></div>
 
           <!-- Camera icon -->

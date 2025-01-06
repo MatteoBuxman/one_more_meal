@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ModalPopupMobile from "$lib/Components/modal_popup_mobile.svelte";
+  import ModalPopupMobile from "$lib/Components/Features/Utilities/modal_popup_mobile.svelte";
   import { formatDate } from "$lib/Logic/format_date";
   import type { OpenOrder } from "$lib/Types/orders";
   import { Clock, ChevronDown, ChevronRight } from "lucide-svelte";
@@ -78,6 +78,6 @@
   {/if}
 </div>
 
-<ModalPopupMobile bind:isOpen>
+<ModalPopupMobile bind:isOpen destroyChildrenOnClose={true}>
     <OpenDonationFurtherInformation {order}/>
 </ModalPopupMobile>

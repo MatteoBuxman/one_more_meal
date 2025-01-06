@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Home, Plus } from "lucide-svelte";
-  import MenuPopup from "$lib/Components/menu_popup.svelte";
+  import MenuPopup from "$lib/Components/Features/Utilities/menu_popup.svelte";
   import DashboardMealManager from "$lib/Components/Features/Dashboard/dashboard_meal_manager.svelte";
   import type { PageData } from "./$types";
 
@@ -22,7 +22,7 @@
   ];
 </script>
 
-<div class="max-w-2xl mx-auto p-4 space-y-3">
+<div class="max-w-2xl mx-auto p-4 space-y-5">
   <!-- Header -->
   <div class="flex justify-between items-center mb-6" id="dashboard_nav">
     <div class="flex items-center space-x-2">

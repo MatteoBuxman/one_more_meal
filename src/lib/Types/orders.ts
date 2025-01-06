@@ -17,3 +17,13 @@ export interface ClosedOrder {
     created_at: number;
     completed_at: number;
 }
+
+export interface Order {
+    id: string;
+    status: 'ordered' | 'picked_up' | 'completed' | 'cancelled';
+    description?: string;
+    meals: Array<Meal>;
+    created_at: number;
+    updated_at?: number;
+    completed_at?: number;
+}

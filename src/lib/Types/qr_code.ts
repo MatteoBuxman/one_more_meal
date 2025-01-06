@@ -3,4 +3,4 @@ export interface Point {
     y: number;
 }
 
-export type SuccessfulQRCodeScanCallback =  (scanData : string) => void;
+export type SuccessfulQRCodeScanCallback =  (scanData : string) => boolean;

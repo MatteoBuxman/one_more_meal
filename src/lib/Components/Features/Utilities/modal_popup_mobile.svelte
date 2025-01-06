@@ -7,6 +7,7 @@
     onOpen?: () => void;
     onClose?: () => void;
     children: Snippet;
+    destroyChildrenOnClose?: boolean;
   };
 
   let {
@@ -14,6 +15,8 @@
     onOpen,
     onClose,
     children,
+    //By default the modal and its children are never removed from the DOM.
+    destroyChildrenOnClose = false,
   }: ModalProps = $props();
 
   let modal: HTMLDialogElement;
@@ -41,7 +44,6 @@
   });
 </script>
 
-
 <dialog bind:this={modal} onclose={() => (isOpen = false)} class="modal">
   <div
     class="modal-box absolute bottom-0 w-full top-20 rounded-t-lg rounded-b-none p-0"
@@ -54,7 +56,10 @@
       </div>
     </form>
     <div>
-      {@render children()}
+     <!-- Logic to implement the destroyChildrenOnClose logic -->
+      {#if !destroyChildrenOnClose || isOpen}
+        {@render children()}
+      {/if}
     </div>
   </div>
   <form method="dialog" class="modal-backdrop">

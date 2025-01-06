@@ -1,11 +1,7 @@
-<script>
-  import ModalPopupMobile from "$lib/Components/modal_popup_mobile.svelte";
+<script lang="ts">
+  import LoadingBar from "$lib/Components/Features/Utilities/loading_bar.svelte";
 
-  let isOpen = $state(false);
+     
 </script>
 
-<button onclick={() => (isOpen = true)}>Open modal</button>
-
-<ModalPopupMobile bind:isOpen>
-  <h1>Hello world</h1>
-</ModalPopupMobile>
+<LoadingBar/>

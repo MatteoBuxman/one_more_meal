@@ -3,13 +3,13 @@
   import EnterMealInformation from "./enter_meal_information.svelte";
   import { getContext } from "svelte";
   import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
-  import ModalPopupMobile from "./modal_popup_mobile.svelte";
+  import ModalPopupMobile from "../Utilities/modal_popup_mobile.svelte";
 
   let flowState = getContext<OneMoreMealPackagingFlowState>(
     "add_meal_flow_state"
   );
 
-  let mealuuid: string = $state("");
+  let mealuuid: Array<string> = $state([]);
   let isOpen = $state(false);
 
   function handlePrematureClose() {
@@ -17,10 +17,11 @@
   }
 
   function scanSuccess(uuid: string) {
-    mealuuid = uuid;
+    mealuuid = [uuid];
     flowState.stateIndex = 2;
+    return false;
   }
-  
+
   $effect(() => {
     if (flowState.stateIndex == 1) {
       isOpen = true;
@@ -47,3 +48,5 @@
     <h1>An error occurred while adding your meal</h1>
   {/if}
 </ModalPopupMobile>
+
+

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import MenuPopup from "$lib/Components/menu_popup.svelte";
-  import OneMoreMealPackagingFlow from "$lib/Components/Flows/one_more_meal_packaging_flow.svelte";
-  import ContextProvider from "$lib/Components/context_provider.svelte";
+  import MenuPopup from "$lib/Components/Features/Utilities/menu_popup.svelte";
+  import OneMoreMealPackagingFlow from "$lib/Components/Features/NewOrder/one_more_meal_packaging_flow.svelte";
+  import ContextProvider from "$lib/Components/Features/Utilities/context_provider.svelte";
   import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
   import { QrCode, AlertCircle } from "lucide-svelte";
   import { goto } from "$app/navigation";
@@ -118,7 +118,7 @@
     </button>
 
     <p class="text-gray-700 mt-8">
-      <span class="font-bold">{contextState.addedMeals.length}</span> added
+      <span class="font-bold">{contextState.addedMeals.reduce((acc, meal)=> acc + meal.quantity, 0)}</span> meals.
     </p>
 
     <ContextProvider {contextValues}>

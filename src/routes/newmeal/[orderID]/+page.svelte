@@ -8,7 +8,7 @@
     Pencil,
   } from "lucide-svelte";
   
-  import RandomFoodIcon from "$lib/Components/random_food_icon.svelte";
+  import RandomFoodIcon from "$lib/Components/Features/Utilities/random_food_icon.svelte";
 
   import { page } from "$app/stores";
   import type { Meal } from "$lib/Types/meals";

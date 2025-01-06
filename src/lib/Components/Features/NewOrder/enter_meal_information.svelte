@@ -1,12 +1,15 @@
 <script lang="ts">
   import type { Meal, OneMoreMealPackagingFlowState } from "$lib/Types/meals";
-  import { getContext, onMount } from "svelte";
+  import { getContext } from "svelte";
+  import ScanAdditionalMeals from "./scan_additional_meals.svelte";
 
   let flowState = getContext<OneMoreMealPackagingFlowState>(
     "add_meal_flow_state"
   );
 
-  let { uuid }: { uuid: string } = $props();
+  let { uuid }: { uuid: Array<string> } = $props();
+
+  let scanAdditionalMeals = $state(false);
 
   let mealData = $state<Meal>({
     uuid,
@@ -17,13 +20,26 @@
 
   function handleAddMeal(event: Event) {
     event.preventDefault();
+
+    if (mealData.quantity > 1) {
+      scanAdditionalMeals = true;
+      return;
+    }
+
+    flowState.addedMeals.push(mealData);
+    flowState.stateIndex = 0;
+  }
+
+  //Handle completion of additional scans
+  function onComplete(IDs: Array<string>) {
+    mealData.uuid.push(...IDs);
     flowState.addedMeals.push(mealData);
     flowState.stateIndex = 0;
   }
 </script>
 
 <!-- Form Content -->
-<form class="space-y-6" onsubmit={handleAddMeal}>
+<form class="space-y-6 px-5" onsubmit={handleAddMeal}>
   <div
     class="inline-flex mt-3 px-3 py-1 rounded-full bg-gray-100 text-sm text-gray-700"
   >
@@ -90,3 +106,6 @@
     Add {mealData.quantity > 1 ? "Meals" : "Meal"}
   </button>
 </form>
+
+<!-- Popup to handle additional scans if there is more than one of a particular meal -->
+<ScanAdditionalMeals bind:isOpen={scanAdditionalMeals} {onComplete} quantity={mealData.quantity} firstID={mealData.uuid[0]}/>

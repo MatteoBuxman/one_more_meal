@@ -1,6 +1,6 @@
 
 <script lang="ts">
-  import MenuPopup from '$lib/Components/menu_popup.svelte';
+  import MenuPopup from '$lib/Components/Features/Utilities/menu_popup.svelte';
   import { CheckCircle, MapPin, Clock, Hash } from 'lucide-svelte';
   
   export let orderId: string = "uhfurhuruubu4ub44b";
