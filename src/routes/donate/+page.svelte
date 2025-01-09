@@ -1,7 +1,11 @@
 <script lang="ts">
-  import LoadingBar from "$lib/Components/Features/Utilities/loading_bar.svelte";
-
-     
+  import OrderStateBadge from "$lib/Components/Features/Dashboard/order_state_badge.svelte";
 </script>
 
-<LoadingBar/>
+
+<OrderStateBadge status="ordered" />
+<OrderStateBadge status="picked_up" />
+<OrderStateBadge status="completed" />
+<OrderStateBadge status="cancelled" />
+
+

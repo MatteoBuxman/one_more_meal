@@ -3,6 +3,7 @@
   import MenuPopup from "$lib/Components/Features/Utilities/menu_popup.svelte";
   import DashboardMealManager from "$lib/Components/Features/Dashboard/dashboard_meal_manager.svelte";
   import type { PageData } from "./$types";
+  import LoadingBar from "$lib/Components/Features/Utilities/loading_bar.svelte";
 
   let { data }: { data: PageData } = $props();
 
@@ -22,7 +23,7 @@
   ];
 </script>
 
-<div class="max-w-2xl mx-auto p-4 space-y-5">
+<div class="max-w-2xl mx-auto p-4 space-y-5 min-h-[800px]">
   <!-- Header -->
   <div class="flex justify-between items-center mb-6" id="dashboard_nav">
     <div class="flex items-center space-x-2">
@@ -46,21 +47,37 @@
     </a>
   </div>
 
-  {#if data.orders.closedOrders.length > 0}
-    <DashboardMealManager orders={data.orders.openOrders} type="open" />
-  {:else}
-    <p class="text-sm text-gray-400">You have no open orders. Create a new one above!</p>
-  {/if}
-
-  <!--Completed Meals-->
-
-  <div class="flex justify-between items-center mb-2">
+  {#await data.openOrders}
+    <LoadingBar />
+  {:then orders}
+    {#if orders.length > 0}
+      <DashboardMealManager {orders} />
+    {:else}
+      <p class="text-sm text-gray-400">
+        You have no open orders. Create a new one above!
+      </p>
+    {/if}
+  {:catch error}
+    <p class="text-red-500">{error.message}</p>
+  {/await}
+  
+  <div class="flex justify-between items-center mb-4">
     <h2 class="font-semibold">Completed Donations.</h2>
   </div>
 
-  {#if data.orders.closedOrders.length > 0}
-    <DashboardMealManager orders={data.orders.closedOrders} type="closed" />
-  {:else}
-    <p class="text-sm text-gray-400">You have not completed any orders.</p>
-  {/if}
+  {#await data.completedOrders}
+    <LoadingBar />
+  {:then orders}
+    {#if orders.length > 0}
+      <DashboardMealManager {orders} />
+    {:else}
+      <p class="text-sm text-gray-400">
+        You have not made any donations yet.
+      </p>
+    {/if}
+  {:catch error}
+    <p class="text-red-500">{error.message}</p>
+  {/await}
+
+
 </div>

@@ -31,7 +31,7 @@
           <h3 class=" text-gray-900 text-sm font-bold">
             {meal_configuration.name}
           </h3>
-          <span class="text-xs text-gray-400">{meal_configuration.uuid[0]}</span>
+          <span class="text-xs text-gray-400">{meal_configuration.ids[0]}</span>
         </div>
         <p class="text-sm text-gray-600">{meal_configuration.description}</p>
       </div>

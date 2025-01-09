@@ -31,7 +31,7 @@ const app = !apps.length ? initializeApp(firebaseConfig) : apps[0];
 
 
 export const auth = getAuth(app);
-const firestore = getFirestore(app);
+export const firestore = getFirestore(app);
 
 if(!PRODUCTION){
     connectAuthEmulator(auth, "http://localhost:9099");

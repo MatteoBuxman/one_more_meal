@@ -1,14 +1,12 @@
 <script lang="ts">
-  import type { OpenOrder, ClosedOrder } from "$lib/Types/orders";
-  import ClosedDonation from "./closed_donation.svelte";
-  import OpenDonation from "./open_donation.svelte";
+  import type { Order } from "$lib/Types/orders";
+  import Donation from "./donation.svelte";
 
   type MealManagerProps = {
-    orders: Array<OpenOrder> | Array<ClosedOrder>;
-    type: "open" | "closed";
+    orders: Array<Order>;
   };
 
-  let { orders, type }: MealManagerProps = $props();
+  let { orders }: MealManagerProps = $props();
 
   let expandedOrder: string | null = $state(null);
 
@@ -17,16 +15,10 @@
   }
 </script>
 
-{#if type === "open"}
+
   <div class="space-y-4">
     {#each orders as order}
-      <OpenDonation order={order as OpenOrder} {expandedOrder} {toggleOrder} />
+      <Donation {order} {expandedOrder} {toggleOrder} />
     {/each}
   </div>
-{:else}
-  <div class="space-y-4">
-    {#each orders as order}
-      <ClosedDonation order={order as ClosedOrder} {expandedOrder} {toggleOrder} />
-    {/each}
-  </div>
-{/if}
+

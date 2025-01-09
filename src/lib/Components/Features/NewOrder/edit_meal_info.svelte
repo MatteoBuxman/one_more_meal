@@ -54,7 +54,7 @@
 
   function handleMealUpdate() {
     const meal = contextState.addedMeals.find(
-      (meal) => meal.uuid === meal_configuration.uuid
+      (meal) => meal.ids[0] === meal_configuration.ids[0]
     ) as Meal;
 
     meal.name = localName;
@@ -66,7 +66,7 @@
 
   function handleMealDelete() {
     const index = contextState.addedMeals.findIndex(
-      (meal) => meal.uuid === meal_configuration.uuid
+      (meal) => meal.ids[0] === meal_configuration.ids[0]
     );
     contextState.addedMeals.splice(index, 1);
     handleClose();
@@ -79,7 +79,7 @@
     <div class="flex flex-col gap-2">
       <h2 class="text-sm">Meal IDs</h2>
       <div class="grid grid-cols-3 gap-2">
-        {#each meal_configuration.uuid as uuid}
+        {#each meal_configuration.ids as uuid}
           <span class="badge badge-primary text-xs">
             {uuid}
           </span>

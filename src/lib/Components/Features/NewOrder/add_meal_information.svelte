@@ -43,7 +43,7 @@
   {#if flowState.stateIndex === 1}
     <ScanQrcode {scanSuccess} />
   {:else if flowState.stateIndex === 2}
-    <EnterMealInformation uuid={mealuuid} />
+    <EnterMealInformation ids={mealuuid} />
   {:else}
     <h1>An error occurred while adding your meal</h1>
   {/if}

@@ -7,12 +7,13 @@
     "add_meal_flow_state"
   );
 
-  let { uuid }: { uuid: Array<string> } = $props();
+  let { ids }: { ids: Array<string> } = $props();
 
   let scanAdditionalMeals = $state(false);
 
   let mealData = $state<Meal>({
-    uuid,
+    firestoreMealID: "eiiebibf8383h",
+    ids,
     name: "",
     description: "",
     quantity: 1,
@@ -32,7 +33,7 @@
 
   //Handle completion of additional scans
   function onComplete(IDs: Array<string>) {
-    mealData.uuid.push(...IDs);
+    mealData.ids.push(...IDs);
     flowState.addedMeals.push(mealData);
     flowState.stateIndex = 0;
   }
@@ -43,7 +44,7 @@
   <div
     class="inline-flex mt-3 px-3 py-1 rounded-full bg-gray-100 text-sm text-gray-700"
   >
-    Meal ID: {uuid}
+    Meal ID: {ids[0]}
   </div>
 
   <div class="space-y-4">
@@ -108,4 +109,4 @@
 </form>
 
 <!-- Popup to handle additional scans if there is more than one of a particular meal -->
-<ScanAdditionalMeals bind:isOpen={scanAdditionalMeals} {onComplete} quantity={mealData.quantity} firstID={mealData.uuid[0]}/>
+<ScanAdditionalMeals bind:isOpen={scanAdditionalMeals} {onComplete} quantity={mealData.quantity} firstID={mealData.ids[0]}/>
