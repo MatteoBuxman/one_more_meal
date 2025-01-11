@@ -6,47 +6,86 @@
     ChevronRight,
     CreditCard,
     Pencil,
+    LoaderPinwheel,
   } from "lucide-svelte";
-  
-  import RandomFoodIcon from "$lib/Components/Features/Utilities/random_food_icon.svelte";
+
+  import RandomFoodIcon from "$lib/Components/Utilities/random_food_icon.svelte";
 
   import { page } from "$app/stores";
   import type { Meal } from "$lib/Types/meals";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
+  import type { OrderWithMeals } from "$lib/Types/orders";
+  import { postOrder } from "$lib/Firebase/Firestore/post_data";
+  import { useFirestore } from "$lib/Firebase/firebase_init";
+  import ErrorModal from "$lib/Components/Errors/error_modal.svelte";
+  import { Timestamp } from "firebase/firestore";
 
   let userName = "Matteo Buxman";
   let userPhone = "082 611 0091";
 
-  let addedMeals : Meal[] = [];
-  let orderID : string;
+  let addedMeals: Meal[] = $state([]);
+  let orderID: string;
+  let isSubmitting = $state(false);
+  let submissionError = $state(false);
 
-  onMount(()=>{
+  const firestore = useFirestore();
+
+  onMount(() => {
     orderID = $page.params.orderID;
-    addedMeals = JSON.parse(sessionStorage.getItem('addedMeals') || '[]');
 
-    const inSessionMeals = JSON.parse(sessionStorage.getItem("addedMeals") || "[]");
-    //Quite a hack of a solution to deal with the state where there is no "addedMeals" in session storage.
-    const expiryTime = inSessionMeals.expiryTime || Date.now() - 100;
+    const isEmpty = (obj: Object) => Object.keys(obj).length === 0;
 
-    //Check if the added meals are still valid
-    if (expiryTime < Date.now()) {
-      addedMeals = [];
+    //Check if there are any existing added meals
+    const inSessionMeals = JSON.parse(
+      sessionStorage.getItem("mostRecentMeals") || "{}"
+    );
+
+    if (isEmpty(inSessionMeals)) {
+      goto(`/newmeal`);
     } else {
-      addedMeals = inSessionMeals.addedMeals;
+      //Check if the added meals are still valid
+      if (inSessionMeals.expiryTime < Date.now()) {
+        goto(`/newmeal`);
+      } else {
+        addedMeals = inSessionMeals.meals;
+      }
     }
+  });
 
-  })
-
-  function handleReturn(){
+  function handleReturn() {
     goto(`/newmeal`);
   }
 
-  function handleComplete(){
-    sessionStorage.removeItem('addedMeals');
-    goto(`/newmeal/${orderID}/confirmed`);
+  async function handleComplete() {
+    isSubmitting = true;
+
+    const order : OrderWithMeals = {
+      id: orderID,
+      meals: addedMeals,
+      status: "ordered",
+      orderSize: addedMeals.reduce((acc, meal) => acc + meal.quantity, 0),
+      created_at: Timestamp.now(),
+      updated_at: null,
+      completed_at: null,
+    };
+
+    try {
+      await postOrder(firestore, "lXBHaMmIqs5UC11ymLT1xgTdg9lA", order);
+
+      sessionStorage.removeItem("mostRecentMeals");
+      goto(`/newmeal/${orderID}/confirmed`);
+    } catch (e) {
+      isSubmitting = false;
+      submissionError = true;
+    }
   }
 </script>
+
+<ErrorModal
+  error_message="Error submitting your order"
+  bind:isOpen={submissionError}
+/>
 
 <div>
   <!-- Header -->
@@ -54,13 +93,15 @@
     class="p-3 flex items-center justify-between bg-white/80 backdrop-blur-sm sticky top-0 z-10"
   >
     <div class="flex items-center space-x-4">
-      <button onclick={handleReturn} class="hover:bg-gray-100 p-2 rounded-full transition-colors">
+      <button
+        onclick={handleReturn}
+        class="hover:bg-gray-100 p-2 rounded-full transition-colors"
+      >
         <ArrowLeft class="w-5 h-5" />
       </button>
       <h1 class="text-xl font-bold">Complete Pickup</h1>
     </div>
   </div>
-
 
   <!-- New Contact Information Section -->
   <div class="px-4 mt-6">
@@ -87,7 +128,9 @@
   </div>
 
   <!-- Store Info Card -->
-  <div class="mx-4 mt-6 bg-white rounded-b-2xl shadow-lg border border-gray-100">
+  <div
+    class="mx-4 mt-6 bg-white rounded-b-2xl shadow-lg border border-gray-100"
+  >
     <div class="bg-gray-100">
       <iframe
         class="w-full h-64"
@@ -157,14 +200,18 @@
         {/if}
         {#each addedMeals as meal}
           <div class="flex items-center gap-4 pb-4">
-            <div class=" bg-gray-100 rounded-full flex items-center justify-center size-12">
+            <div
+              class=" bg-gray-100 rounded-full flex items-center justify-center size-12"
+            >
               <RandomFoodIcon />
             </div>
             <div class="flex-1">
               <h3 class="font-medium">{meal.name}</h3>
-              <p class="text-sm text-gray-600">1 item</p>
+              <p class="text-sm text-gray-600">
+                {meal.quantity}
+                {meal.quantity > 1 ? "meals" : "meal"}
+              </p>
             </div>
-            <ChevronRight class="w-5 h-5 text-gray-400" />
           </div>
         {/each}
       </div>
@@ -191,10 +238,17 @@
     </div>
 
     <button
-    onclick={handleComplete}
-      class="w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-medium shadow-sm transition-all active:scale-[0.98]"
+      onclick={handleComplete}
+      class="text-center w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-light shadow-sm transition-all active:scale-[0.98]"
     >
-      Complete Pickup Request
+      {#if isSubmitting}
+        <div class="text-white flex items-center justify-center gap-2">
+          <p class="font-light">Submitting</p>
+          <LoaderPinwheel class="w-6 h-6 animate-spin" />
+        </div>
+      {:else}
+        <p>Complete Order</p>
+      {/if}
     </button>
 
     <div
@@ -207,5 +261,4 @@
 </div>
 
 <style>
-  
 </style>

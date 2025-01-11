@@ -1,18 +1,21 @@
 <script lang="ts">
-  import MenuPopup from "$lib/Components/Features/Utilities/menu_popup.svelte";
+  import MenuPopup from "$lib/Components/Utilities/menu_popup.svelte";
   import OneMoreMealPackagingFlow from "$lib/Components/Features/NewOrder/one_more_meal_packaging_flow.svelte";
-  import ContextProvider from "$lib/Components/Features/Utilities/context_provider.svelte";
+  import ContextProvider from "$lib/Components/Utilities/context_provider.svelte";
   import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
   import { QrCode, AlertCircle } from "lucide-svelte";
   import { goto } from "$app/navigation";
-  import { randomString } from "$lib/Logic/random_string";
   import { onMount } from "svelte";
+  import LoadingBar from "$lib/Components/Utilities/loading_bar.svelte";
+  import { v4 } from "uuid";
 
   const menu_configuration = [
     { name: "Dashboard", link: "/dashboard" },
     { name: "About", link: "/about" },
     { name: "Contact", link: "/contact" },
   ];
+
+  let loading = $state(true);
 
   let contextState = $state<OneMoreMealPackagingFlowState>({
     stateIndex: 0,
@@ -28,35 +31,43 @@
   }
 
   function handleContinue() {
-    const orderId = randomString(10);
-
-    sessionStorage.setItem(
-      "addedMeals",
-      JSON.stringify({
-        //Valid for 15 minutes
-        expiryTime: Date.now() + 1000 * 60 * 15,
-        addedMeals: contextState.addedMeals,
-      })
-    );
+    const orderId = v4();
 
     goto(`/newmeal/${orderId}`);
   }
 
   onMount(() => {
+    const isEmpty = (obj: Object) => Object.keys(obj).length === 0;
+
     //Check if there are any existing added meals
-    const inSessionMeals = JSON.parse(sessionStorage.getItem("addedMeals") || "[]");
+    const inSessionMeals = JSON.parse(
+      sessionStorage.getItem("mostRecentMeals") || "{}"
+    );
 
-    //Quite a hack of a solution to deal with the state where there is no "addedMeals" in session storage.
-    const expiryTime = inSessionMeals.expiryTime || Date.now() - 100;
-
-    //Check if the added meals are still valid
-    if (expiryTime < Date.now()) {
+    if (isEmpty(inSessionMeals)) {
       contextState.addedMeals = [];
     } else {
-      contextState.addedMeals = inSessionMeals.addedMeals;
+      //Check if the added meals are still valid
+      if (inSessionMeals.expiryTime < Date.now()) {
+        contextState.addedMeals = [];
+      } else {
+        contextState.addedMeals = inSessionMeals.meals;
+      }
     }
 
-   
+    loading = false;
+
+    //Register the effect after onMount has run
+    $effect(() => {
+      //Update the sessionStorage when the added meals array changes
+      sessionStorage.setItem(
+        "mostRecentMeals",
+        JSON.stringify({
+          expiryTime: Date.now() + 1000 * 60 * 15, //15 minutes
+          meals: contextState.addedMeals,
+        })
+      );
+    });
   });
 </script>
 
@@ -71,9 +82,10 @@
   <MenuPopup {menu_configuration} />
 </nav>
 
-
 <div class="max-w-md mx-auto p-4 space-y-6">
-  <p class="text-sm text-gray-500">Click below if your QR codes are already on your packaging.</p>
+  <p class="text-sm text-gray-500">
+    Click below if your QR codes are already on your packaging.
+  </p>
   <!-- Main Content -->
   <div class="space-y-4">
     <button
@@ -95,7 +107,9 @@
       </div>
     </button>
 
-    <p class="text-sm text-gray-500">Click below if you need to get your meal QR codes.</p>
+    <p class="text-sm text-gray-500">
+      Click below if you need to get your meal QR codes.
+    </p>
 
     <button
       type="button"
@@ -117,9 +131,18 @@
       </div>
     </button>
 
-    <p class="text-gray-700 mt-8">
-      <span class="font-bold">{contextState.addedMeals.reduce((acc, meal)=> acc + meal.quantity, 0)}</span> meals.
-    </p>
+    {#if loading}
+      <LoadingBar />
+    {:else}
+      <p class="text-gray-700 mt-8">
+        <span class="font-bold"
+          >{contextState.addedMeals.reduce(
+            (acc, meal) => acc + meal.quantity,
+            0
+          )}</span
+        > meals.
+      </p>
+    {/if}
 
     <ContextProvider {contextValues}>
       <OneMoreMealPackagingFlow />

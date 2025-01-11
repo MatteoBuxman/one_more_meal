@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ContextProvider from "$lib/Components/Features/Utilities/context_provider.svelte";
+  import ContextProvider from "$lib/Components/Utilities/context_provider.svelte";
   import { firebaseContext } from "../hooks.client";
   import "../app.css";
   let { children } = $props();
@@ -9,8 +9,8 @@
   {@render children()}
 </ContextProvider>
 
-<div class="divider mb-0 pb-0"></div>
-<footer class="footer bg-gray-50 text-base-content p-10">
+
+<footer class="footer bg-gray-50 text-base-content p-10 rounded-t-lg">
 	<nav>
 	  <h6 class="footer-title">Company</h6>
 	  <a class="link link-hover">About Us</a>

@@ -3,7 +3,7 @@
   import EnterMealInformation from "./enter_meal_information.svelte";
   import { getContext } from "svelte";
   import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
-  import ModalPopupMobile from "../Utilities/modal_popup_mobile.svelte";
+  import ModalPopupMobile from "../../Utilities/modal_popup_mobile.svelte";
 
   let flowState = getContext<OneMoreMealPackagingFlowState>(
     "add_meal_flow_state"
@@ -31,7 +31,7 @@
   });
 </script>
 
-<ModalPopupMobile bind:isOpen onClose={handlePrematureClose}>
+<ModalPopupMobile bind:isOpen onClose={handlePrematureClose} destroyChildrenOnClose={true}>
   <div class="flex justify-between items-center">
     <ul class="steps">
       <li class="step step-primary text-sm">Scan QR</li>

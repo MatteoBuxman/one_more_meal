@@ -3,12 +3,13 @@
   import { formatDate } from "$lib/Logic/format_date";
   import type { Order } from "$lib/Types/orders";
   import ViewMealRecipient from "./view_meal_recipient.svelte";
-  import LoadingBar from "../Utilities/loading_bar.svelte";
+  import LoadingBar from "../../Utilities/loading_bar.svelte";
   import { slide } from "svelte/transition";
   import { useFirestore } from "$lib/Firebase/firebase_init";
   import type { Meal, MealsWithRecipients } from "$lib/Types/meals";
   import OrderStateBadge from "./order_state_badge.svelte";
   import { Clock } from "lucide-svelte";
+  import ErrorBadge from "$lib/Components/Errors/error_badge.svelte";
 
   let { order, meals }: { order: Order; meals: Meal[] } = $props();
 
@@ -35,7 +36,7 @@
       </h2>
       <div class="flex items-center gap-2 text-sm text-gray-500">
         <Clock size={18} class="text-gray-500" />
-        <span>{formatDate(order.created_at)}</span>
+        <span>{formatDate((order.created_at) as number)}</span>
       </div>
     </div>
 
@@ -85,11 +86,9 @@
     </div>
   </div>
 {:catch error}
-  <div class="p-4">
-    <p class="text-sm text-red-500">
-      {error.message}
-    </p>
-  </div>
+<div class="m-4">
+  <ErrorBadge {error} />
+</div>
 {/await}
 
 <!-- Footer -->

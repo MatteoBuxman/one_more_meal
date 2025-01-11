@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { Meal, OneMoreMealPackagingFlowState } from "$lib/Types/meals";
   import { getContext } from "svelte";
-  import ModalPopupMobile from "../Utilities/modal_popup_mobile.svelte";
+  import ModalPopupMobile from "../../Utilities/modal_popup_mobile.svelte";
+  import { clampString } from "$lib/Logic/clamp_string";
 
   const contextState = getContext<OneMoreMealPackagingFlowState>(
     "add_meal_flow_state"
@@ -81,7 +82,7 @@
       <div class="grid grid-cols-3 gap-2">
         {#each meal_configuration.ids as uuid}
           <span class="badge badge-primary text-xs">
-            {uuid}
+            {clampString(uuid, 8)}
           </span>
         {/each}
       </div>

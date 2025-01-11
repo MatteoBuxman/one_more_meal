@@ -5,8 +5,9 @@ import type { FirebaseAuthObject, FirebaseContext } from "$lib/Types/firebase_in
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getApps, initializeApp } from "firebase/app";
 
-// Set this to true for production
-const PRODUCTION = false;
+//Production or Development mode
+import { PUBLIC_PRODUCTION } from "$lib/Logic/production_state";
+
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -33,7 +34,7 @@ const app = !apps.length ? initializeApp(firebaseConfig) : apps[0];
 export const auth = getAuth(app);
 export const firestore = getFirestore(app);
 
-if(!PRODUCTION){
+if(!PUBLIC_PRODUCTION){
     connectAuthEmulator(auth, "http://localhost:9099");
     connectFirestoreEmulator(firestore, "localhost", 8080);
 }
@@ -113,4 +114,8 @@ export function useAuthStore() {
   return context.authStore;
 }
 
+
+export function initSignInMethods(){
+  
+}
 

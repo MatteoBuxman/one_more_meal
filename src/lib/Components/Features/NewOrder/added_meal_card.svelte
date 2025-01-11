@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { Meal } from "$lib/Types/meals";
   import { ChevronRight } from "lucide-svelte";
-  import RandomFoodIcon from "../Utilities/random_food_icon.svelte";
+  import RandomFoodIcon from "../../Utilities/random_food_icon.svelte";
   import EditMealInfo from "./edit_meal_info.svelte";
+  import { clampString } from "$lib/Logic/clamp_string";
 
   let { meal_configuration }: { meal_configuration: Meal } = $props();
 
@@ -31,7 +32,6 @@
           <h3 class=" text-gray-900 text-sm font-bold">
             {meal_configuration.name}
           </h3>
-          <span class="text-xs text-gray-400">{meal_configuration.ids[0]}</span>
         </div>
         <p class="text-sm text-gray-600">{meal_configuration.description}</p>
       </div>

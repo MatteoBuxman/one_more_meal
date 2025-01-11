@@ -1,125 +1,217 @@
 import { reconcileMealsWithRecipientInformation } from "$lib/Logic/reconcile_meals_with_recipient_information";
-import type { DashboardSnapshot } from "$lib/Types/dashboard";
-import type { Meal, MealRecipient, MealsWithRecipients } from "$lib/Types/meals";
+import type {
+  Meal,
+  MealRecipient,
+  MealsWithRecipients,
+} from "$lib/Types/meals";
 import type { Order } from "$lib/Types/orders";
-import { collection, Firestore, getDocs, QuerySnapshot, Timestamp } from "firebase/firestore";
+import {
+  collection,
+  Firestore,
+  getDocs,
+  QuerySnapshot,
+  Timestamp,
+} from "firebase/firestore";
+//Production or Development mode
+import { PUBLIC_PRODUCTION } from "$lib/Logic/production_state";
+import { FirebaseError } from "firebase/app";
 
-const PRODUCTION = false;
+const parseSnapshotDataAsOrder = (snapshot: QuerySnapshot): Order[] => {
+  const orders = snapshot.docs.map((doc) => {
+    const orderData = doc.data();
 
-const parseSnapshotDataAsOrder = (snapshot: QuerySnapshot) : Order[] => {
-    const orders = snapshot.docs.map(doc => {
+    const order: Order = {
+      id: doc.id,
+      status: orderData.status,
+      orderSize: orderData.orderSize,
+      created_at: (orderData.created_at as Timestamp).toMillis(),
+      updated_at: (orderData.updated_at as Timestamp)
+        ? orderData.updated_at.toMillis()
+        : null,
+      completed_at: (orderData.completed_at as Timestamp)
+        ? orderData.completed_at.toMillis()
+        : null,
+    };
 
-        const orderData = doc.data();
+    return order;
+  });
+  return orders;
+};
 
-        const order : Order = {
-            id: doc.id,
-            status: orderData.status,
-            orderSize: orderData.orderSize,
-            created_at: (orderData.created_at as Timestamp).toMillis(),
-            updated_at: (orderData.updated_at as Timestamp).toMillis() || null,
-            completed_at: (orderData.completed_at as Timestamp) ? orderData.completed_at.toMillis() : null
-        }
+const parseSnapshotDataAsMeals = (snapshot: QuerySnapshot): Meal[] => {
+  const meals = snapshot.docs.map((doc) => {
+    const mealData = doc.data();
+    const meal: Meal = {
+      firestoreMealID: doc.id,
+      ids: mealData.meal_IDs,
+      name: mealData.name,
+      description: mealData.description || null,
+      quantity: mealData.quantity,
+    };
+    return meal;
+  });
+  return meals;
+};
 
-        return order;
-    });
-    return orders;
-}
-
-const parseSnapshotDataAsMeals = (snapshot: QuerySnapshot) : Meal[] => {
-    const meals = snapshot.docs.map(doc => {
-        const mealData = doc.data();
-        const meal : Meal = {
-            firestoreMealID: doc.id,
-            ids: mealData.meal_IDs,
-            name: mealData.name,
-            description: mealData.description || null,
-            quantity: mealData.quantity
-        }
-        return meal;
-    });
-    return meals;
-}
-
-const parseSnapshotDataAsMealRecipients = (snapshot: QuerySnapshot) : MealRecipient[] => { 
-    const recipients = snapshot.docs.map(doc => {
-        const recipientData = doc.data();
-        const recipient : MealRecipient = {
-            delivered: recipientData.delivered,
-            id: doc.id,
-            recipientName: recipientData.recipientName || null,
-            recipientSurname: recipientData.recipientSurname || null,
-            acceptanceImgURL: recipientData.acceptanceImgURL || null
-        }
-        return recipient;
-    });
-    return recipients;
-}
+const parseSnapshotDataAsMealRecipients = (
+  snapshot: QuerySnapshot
+): MealRecipient[] => {
+  const recipients = snapshot.docs.map((doc) => {
+    const recipientData = doc.data();
+    const recipient: MealRecipient = {
+      delivered: recipientData.delivered,
+      id: doc.id,
+      recipientName: recipientData.recipientName || null,
+      recipientSurname: recipientData.recipientSurname || null,
+      acceptanceImgURL: recipientData.acceptanceImgURL || null,
+    };
+    return recipient;
+  });
+  return recipients;
+};
 
 //Fetch user orders for the dashboard page.
-export const fetchUserOpenOrders = async (firestore: Firestore, userUUID: string) : Promise<Order[]> => {
+export const fetchUserOpenOrders = async (
+  firestore: Firestore,
+  userUUID: string
+): Promise<Order[]> => {
+  try {
+    if (!userUUID) {
+      throw new Error("User UUID is required");
+    }
 
-    //Handle open order fetching.
     const docPath = collection(firestore, `Orders/${userUUID}/openOrders`);
-    const openOrders = getDocs(docPath);
+    const snapshot = await getDocs(docPath);
+    const orders = parseSnapshotDataAsOrder(snapshot);
 
-    return new Promise<Order[]>((resolve, reject) => {
-        openOrders.then(snapshot => {
-            const orders = parseSnapshotDataAsOrder(snapshot);
-            !PRODUCTION ? setTimeout(() => resolve(orders), 1200) : resolve(orders);
-        }).catch(err => {
-            !PRODUCTION ? setTimeout(() => reject(err), 1200) : reject(err);
-        });
-    });
-}
+    if (!PUBLIC_PRODUCTION) {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+    }
+
+    return orders;
+  } catch (error) {
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case "permission-denied":
+          throw new Error("You do not have permission to view these open orders");
+        case "not-found":
+          throw new Error("Not found in database.");
+        default:
+          throw new Error("Failed to fetch open orders");
+      }
+    }
+    throw error;
+  }
+};
 
 //Fetch user orders for the dashboard page.
-export const fetchUserCompletedOrders = async (firestore: Firestore, userUUID: string) : Promise<Order[]> => {
+export const fetchUserCompletedOrders = async (
+  firestore: Firestore,
+  userUUID: string
+): Promise<Order[]> => {
+  try {
+    if (!userUUID) {
+      throw new Error("User UUID is required");
+    }
 
-    //Handle open order fetching.
     const docPath = collection(firestore, `Orders/${userUUID}/completedOrders`);
-    const openOrders = getDocs(docPath);
+    const snapshot = await getDocs(docPath);
+    const orders = parseSnapshotDataAsOrder(snapshot);
 
-    return new Promise<Order[]>((resolve, reject) => {
-        openOrders.then(snapshot => {
-            const orders = parseSnapshotDataAsOrder(snapshot);
-            !PRODUCTION ? setTimeout(() => resolve(orders), 1200) : resolve(orders);
-        }).catch(err => {
-            !PRODUCTION ? setTimeout(() => reject(err), 1200) : reject(err);
-        });
-    });
-}
+    if (!PUBLIC_PRODUCTION) {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+    }
 
-export const fetchOrderMeals = async (firestore: Firestore, orderID: string) : Promise<Meal[]> => {
+    return orders;
+  } catch (error) {
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case "permission-denied":
+          throw new Error("You do not have permission to view these completed orders");
+        case "not-found":
+          throw new Error("Orders not found in the database.");
+        default:
+          throw new Error("Failed to fetch orders.");
+      }
+    }
+    throw error;
+  }
+};
+
+export const fetchOrderMeals = async (
+  firestore: Firestore,
+  orderID: string
+): Promise<Meal[]> => {
+  try {
+    if (!orderID) {
+      throw new Error("Order ID is required");
+    }
+
     const docPath = collection(firestore, `Meals/${orderID}/meals`);
-    const order = getDocs(docPath);
+    const snapshot = await getDocs(docPath);
+    const meals = parseSnapshotDataAsMeals(snapshot);
 
-    return new Promise<Meal[]>((resolve, reject) => {
-        order.then(snapshot => {
-            const meals = parseSnapshotDataAsMeals(snapshot);
-            !PRODUCTION ? setTimeout(() => resolve(meals), 1200) : resolve(meals);
-        }).catch(err => {
-            !PRODUCTION ? setTimeout(() => reject(err), 1200) : reject(err);
-        });
-    });
-}
+    if (!PUBLIC_PRODUCTION) {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+    }
+
+    return meals;
+  } catch (error) {
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case "permission-denied":
+          throw new Error("You do not have permission to view these meals");
+        case "not-found":
+          return [];
+        default:
+          throw new Error("Failed to fetch meals.");
+      }
+    }
+    throw error;
+  }
+};
 
 //Fetches all recipient information for a given order and then combines the order meals with each individual meal UUID
-export const fetchMealRecipientInfo = async (firestore: Firestore, orderID: string, meals: Meal[]) : Promise<MealsWithRecipients[]> => {
+export const fetchMealRecipientInfo = async (
+  firestore: Firestore,
+  orderID: string,
+  meals: Meal[]
+): Promise<MealsWithRecipients[]> => {
+  try {
+    if (!orderID) {
+      throw new Error("Order ID is required");
+    }
+    if (!meals || !Array.isArray(meals)) {
+      throw new Error("Valid meals array is required");
+    }
+
     const docPath = collection(firestore, `Meals/${orderID}/recipients`);
-    const order = getDocs(docPath);
+    const snapshot = await getDocs(docPath);
+    const recipients = parseSnapshotDataAsMealRecipients(snapshot);
+    const mealsWithRecipients = reconcileMealsWithRecipientInformation(
+      meals,
+      recipients
+    );
 
-    return new Promise<MealsWithRecipients[]>((resolve, reject) => {
-        order.then(snapshot => {
+    if (!PUBLIC_PRODUCTION) {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+    }
 
-            const recipients = parseSnapshotDataAsMealRecipients(snapshot);
-            const returnVal = reconcileMealsWithRecipientInformation(meals, recipients);
-
-            !PRODUCTION ? setTimeout(() => resolve(returnVal), 1200) : resolve(returnVal);
-
-        }).catch(err => {
-            !PRODUCTION ? setTimeout(() => reject(err), 1200) : reject(err);
-        });
-    });
-}
-
-    
+    return mealsWithRecipients;
+  } catch (error) {
+    console.error("Error fetching meal recipient info:", error);
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case "permission-denied":
+          throw new Error(
+            "You do not have permission to view recipient information"
+          );
+        case "not-found":
+          throw new Error("Recipient information not found");
+        default:
+          throw new Error("Failed to fetch recipient information");
+      }
+    }
+    throw error;
+  }
+};

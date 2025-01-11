@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Check, CircleX, Clock } from "lucide-svelte";
-  import ModalPopupMobile from "../Utilities/modal_popup_mobile.svelte";
-  import RandomFoodIcon from "../Utilities/random_food_icon.svelte";
+  import ModalPopupMobile from "../../Utilities/modal_popup_mobile.svelte";
   import type { MealRecipient } from "$lib/Types/meals";
   import { getContext } from "svelte";
   import type { Order } from "$lib/Types/orders";

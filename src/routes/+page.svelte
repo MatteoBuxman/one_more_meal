@@ -1,6 +1,6 @@
 <script lang="ts">
   import Card from "$lib/Components/Static/HomePage/home_page_card.svelte";
-  import MenuPopup from "$lib/Components/Features/Utilities/menu_popup.svelte";
+  import MenuPopup from "$lib/Components/Utilities/menu_popup.svelte";
 
   const card_information = [
     {

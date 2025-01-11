@@ -1,16 +1,17 @@
 <script lang="ts">
-  import ModalPopupMobile from "$lib/Components/Features/Utilities/modal_popup_mobile.svelte";
+  import ModalPopupMobile from "$lib/Components/Utilities/modal_popup_mobile.svelte";
   import { formatDate } from "$lib/Logic/format_date";
   import type { Order } from "$lib/Types/orders";
-  import { Clock, ChevronDown, ChevronRight } from "lucide-svelte";
-  import OpenDonationFurtherInformation from "./donation_further_information.svelte";
-  import LoadingBar from "../Utilities/loading_bar.svelte";
+  import { Clock, ChevronDown, ChevronRight, OctagonAlert } from "lucide-svelte";
+  import DonationFurtherInformation from "./donation_further_information.svelte";
+  import LoadingBar from "../../Utilities/loading_bar.svelte";
   import { useFirestore } from "$lib/Firebase/firebase_init";
   import { fetchOrderMeals } from "$lib/Firebase/Firestore/fetch_data";
   import type { Meal } from "$lib/Types/meals";
   import { clampString } from "$lib/Logic/clamp_string";
   import { slide } from "svelte/transition";
   import OrderStateBadge from "./order_state_badge.svelte";
+  import ErrorBadge from "$lib/Components/Errors/error_badge.svelte";
   
 
   type OpenDonationProps = {
@@ -26,7 +27,7 @@
 
   const firestore = useFirestore();
 
-  let meals: Meal[];
+  let meals: Meal[] = $state([]);
 
   //Fetch the meals in this order when the user clicks on it.
   async function fetchMeals(): Promise<Meal[]> {
@@ -50,7 +51,7 @@
           <div class="flex gap-2">
           <Clock size={20} class="text-gray-400" />
           <span class="text-sm text-gray-500"
-            >{formatDate(order.created_at)}</span
+            >{formatDate((order.created_at) as number)}</span
           >
 
         </div>
@@ -65,7 +66,7 @@
         </div>
         </div>
         <div>
-          <h3 class="text-sm font-semibold">Order #{order.id}...</h3>
+          <h3 class="text-sm font-semibold">Order #{clampString(order.id, 8)}</h3>
           <p class="text-sm text-gray-600">{order.orderSize} meals</p>
         </div>
       </div>
@@ -98,7 +99,7 @@
             </button>
           {/each}
           {:catch error}
-            <p class="text-sm text-red-600">{error.message}</p>
+          <ErrorBadge {error} />
         {/await}
       </div>
     </div>
@@ -106,5 +107,5 @@
 </div>
 
 <ModalPopupMobile bind:isOpen destroyChildrenOnClose={true}>
-  <OpenDonationFurtherInformation {order} {meals}/>
+  <DonationFurtherInformation {order} {meals}/>
 </ModalPopupMobile>

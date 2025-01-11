@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ModalPopupMobile from "$lib/Components/Features/Utilities/modal_popup_mobile.svelte";
+  import ModalPopupMobile from "$lib/Components/Utilities/modal_popup_mobile.svelte";
   import ScanQrcode from "$lib/Components/Features/NewOrder/scan_qr code.svelte";
 
   let {

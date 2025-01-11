@@ -1,9 +1,10 @@
 <script lang="ts">
   import { Home, Plus } from "lucide-svelte";
-  import MenuPopup from "$lib/Components/Features/Utilities/menu_popup.svelte";
+  import MenuPopup from "$lib/Components/Utilities/menu_popup.svelte";
   import DashboardMealManager from "$lib/Components/Features/Dashboard/dashboard_meal_manager.svelte";
   import type { PageData } from "./$types";
-  import LoadingBar from "$lib/Components/Features/Utilities/loading_bar.svelte";
+  import LoadingBar from "$lib/Components/Utilities/loading_bar.svelte";
+  import ErrorModal from "$lib/Components/Errors/error_modal.svelte";
 
   let { data }: { data: PageData } = $props();
 
@@ -47,6 +48,8 @@
     </a>
   </div>
 
+  
+
   {#await data.openOrders}
     <LoadingBar />
   {:then orders}
@@ -58,9 +61,10 @@
       </p>
     {/if}
   {:catch error}
-    <p class="text-red-500">{error.message}</p>
+    <p class="text-red-400 font-bold text-sm">Could not fetch open orders.</p>
+    <ErrorModal error_message={error.message} />
   {/await}
-  
+
   <div class="flex justify-between items-center mb-4">
     <h2 class="font-semibold">Completed Donations.</h2>
   </div>
@@ -72,12 +76,11 @@
       <DashboardMealManager {orders} />
     {:else}
       <p class="text-sm text-gray-400">
-        You have not made any donations yet.
+        You have not completed any donations yet.
       </p>
     {/if}
   {:catch error}
-    <p class="text-red-500">{error.message}</p>
+    <p class="text-red-400 font-bold text-sm">Could not fetch completed orders.</p>
+    <ErrorModal error_message={error.message} />
   {/await}
-
-
 </div>
