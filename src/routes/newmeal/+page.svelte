@@ -8,6 +8,9 @@
   import { onMount } from "svelte";
   import LoadingBar from "$lib/Components/Utilities/loading_bar.svelte";
   import { v4 } from "uuid";
+  import ModalPopupMobile from "$lib/Components/Utilities/modal_popup_mobile.svelte";
+  import GenerateQrcodes from "$lib/Components/Features/NewOrder/generate_qrcodes.svelte";
+  import { page } from "$app/stores";
 
   const menu_configuration = [
     { name: "Dashboard", link: "/dashboard" },
@@ -16,6 +19,8 @@
   ];
 
   let loading = $state(true);
+
+  let generateQrcodes = $state(false);
 
   let contextState = $state<OneMoreMealPackagingFlowState>({
     stateIndex: 0,
@@ -68,6 +73,7 @@
         })
       );
     });
+    
   });
 </script>
 
@@ -112,6 +118,7 @@
     </p>
 
     <button
+      onclick={() => (generateQrcodes = true)}
       type="button"
       class="w-full card p-6 flex flex-col items-center justify-center space-y-4 hover:bg-gray-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
       aria-label="Get QR codes help"
@@ -147,6 +154,11 @@
     <ContextProvider {contextValues}>
       <OneMoreMealPackagingFlow />
     </ContextProvider>
+
+    <ModalPopupMobile bind:isOpen={generateQrcodes}>
+      <GenerateQrcodes />
+    </ModalPopupMobile>
+
     <button
       onclick={handleContinue}
       type="button"

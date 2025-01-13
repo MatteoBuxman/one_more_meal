@@ -2,7 +2,6 @@ import { fetchUserCompletedOrders, fetchUserOpenOrders } from "$lib/Firebase/Fir
 import type { PageLoad } from "./$types.js";
 import { firestore } from "$lib/Firebase/firebase_init.js";
 
-export const ssr = false;
 
 export const load: PageLoad = async () => {
 

@@ -34,6 +34,7 @@
 		"firebaseui": "^6.1.0",
 		"jsqr": "^1.4.0",
 		"lucide-svelte": "^0.469.0",
+		"pdf-lib": "^1.17.1",
 		"uuid": "^11.0.4"
 	}
 }

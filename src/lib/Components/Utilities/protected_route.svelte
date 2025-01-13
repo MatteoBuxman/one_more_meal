@@ -14,7 +14,7 @@
 
   $effect(() => {
     if (!$auth.loading && !$auth.error && !$auth.user) {
-      goto("/"); // or whatever your login route is
+      goto("/?signin=true");
     }
   });
 </script>
@@ -27,7 +27,7 @@
   {@render children()}
 {:else if !$auth.error && !$auth.user}
   <div class="flex justify-center items-center h-screen">
-    <p class="text-2xl">Redirecting</p>
+    <p class="text-2xl">Going to sign in.</p>
   </div>
 {:else if $auth.error}
   <div class="flex justify-center items-center h-screen">

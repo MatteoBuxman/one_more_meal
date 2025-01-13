@@ -1,9 +1,10 @@
 <script lang="ts">
   import ScanQrcode from "./scan_qr code.svelte";
   import EnterMealInformation from "./enter_meal_information.svelte";
-  import { getContext } from "svelte";
+  import { getContext, onMount } from "svelte";
   import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
   import ModalPopupMobile from "../../Utilities/modal_popup_mobile.svelte";
+  import { page } from "$app/stores";
 
   let flowState = getContext<OneMoreMealPackagingFlowState>(
     "add_meal_flow_state"
@@ -27,8 +28,20 @@
       isOpen = true;
     } else if (flowState.stateIndex == 0) {
       isOpen = false;
+    }else if (flowState.stateIndex == 2) {
+      isOpen = true;
     }
   });
+
+  onMount(()=>{
+    //Check URL params
+    const rndParam = $page.url.searchParams.get("rnd") || "";
+
+    if (rndParam) {
+      mealuuid = [rndParam];
+      flowState.stateIndex = 2;
+    }
+  })
 </script>
 
 <ModalPopupMobile bind:isOpen onClose={handlePrematureClose} destroyChildrenOnClose={true}>

@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { page } from "$app/stores";
   import Card from "$lib/Components/Static/HomePage/home_page_card.svelte";
   import MenuPopup from "$lib/Components/Utilities/menu_popup.svelte";
+  import ModalPopupMobile from "$lib/Components/Utilities/modal_popup_mobile.svelte";
+  import { onMount } from "svelte";
 
   const card_information = [
     {
@@ -31,293 +34,28 @@
     { name: "Contact", link: "/contact" },
   ];
 
-  let email: string, password: string;
+  let showSignIn = $state(false);
 
-  const handleSignIn = () => {
-    // Handle sign-in logic here
-    console.log("Signing in with:", { email, password });
-  };
-
-  const signInWithGoogle = () => {
-    // Handle Google sign-in logic here
-    console.log("Signing in with Google");
-  };
-
-  const signInWithFacebook = () => {
-    // Handle Facebook sign-in logic here
-    console.log("Signing in with Facebook");
-  };
-
-  function handleClose () {
-    (document.getElementById("sign_in_modal") as HTMLDialogElement).close();
-  };
-
-  
+  onMount(() => {
+    const signIn = Boolean($page.url.searchParams.get("signin"));
+    showSignIn = signIn;
+  });
 </script>
 
 <!-- DaisyUI Modal -->
-<dialog class="modal" id="sign_in_modal">
-  <div class="modal-box">
-    <h3 class="text-lg font-bold">Sign In</h3>
-    <div class="form-control mt-4">
-      <label class="label" for="username">
-        <span class="label-text">Email</span>
-      </label>
-      <input
-        id="username"
-        type="email"
-        class="input input-bordered w-full focus:outline-none"
-        bind:value={email}
-        placeholder="Enter your email"
-      />
-    </div>
-    <div class="form-control mt-4">
-      <label class="label" for="password">
-        <span class="label-text">Password</span>
-      </label>
-      <input
-        type="password"
-        id="password"
-        class="input input-bordered w-full focus:outline-none"
-        bind:value={password}
-        placeholder="Enter your password"
-      />
-    </div>
-    <button class="btn btn-primary w-full mt-4" onclick={handleSignIn}>
-      Sign In
-    </button>
-    <div class="divider">OR</div>
-    <button
-      class="btn border border-slate-300 rounded-full w-full flex items-center gap-2"
-      onclick={signInWithGoogle}
-    >
-      <svg
-        class="w-8"
-        style="enable-background:new 0 0 150 150;"
-        version="1.1"
-        viewBox="0 0 150 150"
-        xml:space="preserve"
-        xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-        ><style type="text/css">
-          .st0 {
-            fill: #1a73e8;
-          }
-          .st1 {
-            fill: #ea4335;
-          }
-          .st2 {
-            fill: #4285f4;
-          }
-          .st3 {
-            fill: #fbbc04;
-          }
-          .st4 {
-            fill: #34a853;
-          }
-          .st5 {
-            fill: #4caf50;
-          }
-          .st6 {
-            fill: #1e88e5;
-          }
-          .st7 {
-            fill: #e53935;
-          }
-          .st8 {
-            fill: #c62828;
-          }
-          .st9 {
-            fill: #fbc02d;
-          }
-          .st10 {
-            fill: #1565c0;
-          }
-          .st11 {
-            fill: #2e7d32;
-          }
-          .st12 {
-            fill: #f6b704;
-          }
-          .st13 {
-            fill: #e54335;
-          }
-          .st14 {
-            fill: #4280ef;
-          }
-          .st15 {
-            fill: #34a353;
-          }
-          .st16 {
-            clip-path: url(#SVGID_2_);
-          }
-          .st17 {
-            fill: #188038;
-          }
-          .st18 {
-            opacity: 0.2;
-            fill: #ffffff;
-            enable-background: new;
-          }
-          .st19 {
-            opacity: 0.3;
-            fill: #0d652d;
-            enable-background: new;
-          }
-          .st20 {
-            clip-path: url(#SVGID_4_);
-          }
-          .st21 {
-            opacity: 0.3;
-            fill: url(#_45_shadow_1_);
-            enable-background: new;
-          }
-          .st22 {
-            clip-path: url(#SVGID_6_);
-          }
-          .st23 {
-            fill: #fa7b17;
-          }
-          .st24 {
-            opacity: 0.3;
-            fill: #174ea6;
-            enable-background: new;
-          }
-          .st25 {
-            opacity: 0.3;
-            fill: #a50e0e;
-            enable-background: new;
-          }
-          .st26 {
-            opacity: 0.3;
-            fill: #e37400;
-            enable-background: new;
-          }
-          .st27 {
-            fill: url(#Finish_mask_1_);
-          }
-          .st28 {
-            fill: #ffffff;
-          }
-          .st29 {
-            fill: #0c9d58;
-          }
-          .st30 {
-            opacity: 0.2;
-            fill: #004d40;
-            enable-background: new;
-          }
-          .st31 {
-            opacity: 0.2;
-            fill: #3e2723;
-            enable-background: new;
-          }
-          .st32 {
-            fill: #ffc107;
-          }
-          .st33 {
-            opacity: 0.2;
-            fill: #1a237e;
-            enable-background: new;
-          }
-          .st34 {
-            opacity: 0.2;
-          }
-          .st35 {
-            fill: #1a237e;
-          }
-          .st36 {
-            fill: url(#SVGID_7_);
-          }
-          .st37 {
-            fill: #fbbc05;
-          }
-          .st38 {
-            clip-path: url(#SVGID_9_);
-            fill: #e53935;
-          }
-          .st39 {
-            clip-path: url(#SVGID_11_);
-            fill: #fbc02d;
-          }
-          .st40 {
-            clip-path: url(#SVGID_13_);
-            fill: #e53935;
-          }
-          .st41 {
-            clip-path: url(#SVGID_15_);
-            fill: #fbc02d;
-          }
-        </style><g
-          ><path
-            class="st14"
-            d="M120,76.1c0-3.1-0.3-6.3-0.8-9.3H75.9v17.7h24.8c-1,5.7-4.3,10.7-9.2,13.9l14.8,11.5   C115,101.8,120,90,120,76.1L120,76.1z"
-          /><path
-            class="st15"
-            d="M75.9,120.9c12.4,0,22.8-4.1,30.4-11.1L91.5,98.4c-4.1,2.8-9.4,4.4-15.6,4.4c-12,0-22.1-8.1-25.8-18.9   L34.9,95.6C42.7,111.1,58.5,120.9,75.9,120.9z"
-          /><path
-            class="st12"
-            d="M50.1,83.8c-1.9-5.7-1.9-11.9,0-17.6L34.9,54.4c-6.5,13-6.5,28.3,0,41.2L50.1,83.8z"
-          /><path
-            class="st13"
-            d="M75.9,47.3c6.5-0.1,12.9,2.4,17.6,6.9L106.6,41C98.3,33.2,87.3,29,75.9,29.1c-17.4,0-33.2,9.8-41,25.3   l15.2,11.8C53.8,55.3,63.9,47.3,75.9,47.3z"
-          /></g
-        ></svg
-      >
-
-      Continue with Google
-    </button>
-    <button
-      class="btn border border-slate-300 rounded-full w-full flex items-center gap-2 mt-2"
-      onclick={signInWithFacebook}
-    >
-      <svg
-        class="w-5"
-        id="Layer_1"
-        style="enable-background:new 0 0 1000 1000;"
-        version="1.1"
-        viewBox="0 0 1000 1000"
-        xml:space="preserve"
-        xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
-        ><style type="text/css">
-          .st0 {
-            fill: #3b579d;
-          }
-          .st1 {
-            fill: #ffffff;
-          }
-        </style><g
-          ><path
-            class="st0"
-            d="M500,1000L500,1000C223.9,1000,0,776.1,0,500v0C0,223.9,223.9,0,500,0h0c276.1,0,500,223.9,500,500v0   C1000,776.1,776.1,1000,500,1000z"
-          /><path
-            class="st1"
-            d="M630,1000V612.7h130l19.5-150.9H630v-96.4c0-43.7,12.1-73.5,74.8-73.5l79.9,0V157   c-13.8-1.8-61.3-5.9-116.5-5.9c-115.2,0-194.1,70.3-194.1,199.5v111.3H343.8v150.9h130.3V1000H630z"
-            id="f"
-          /></g
-        ></svg
-      >
-      Continue with Facebook
-    </button>
-    <div class="mt-4 text-center">
-      <a href="/signup" class="link"> Don't have an account? Sign up here. </a>
-    </div>
-  </div>
-  <form method="dialog" class="modal-backdrop">
-    <button>close</button>
-  </form>
-</dialog>
+<ModalPopupMobile bind:isOpen={showSignIn}>
+  <h1>Sign in</h1>
+</ModalPopupMobile>
 
 <div>
-  <nav class="navbar p-4" >
+  <nav class="navbar p-4">
     <div class="flex-1">
       <img src="/main_logo_pinkaccent.png" alt="logo_image" class="w-7" />
       <a class="text-xl font-lexend p-3" aria-label="home_link" href="/"
         >One More Meal</a
       >
     </div>
-    <MenuPopup {menu_configuration}/>
+    <MenuPopup {menu_configuration} />
   </nav>
   <div id="hero_landing_section" class="p-5">
     <section class="homepage-section flex flex-col h-full justify-between">
