@@ -15,6 +15,8 @@ import {
 //Production or Development mode
 import { PUBLIC_PRODUCTION } from "$lib/Logic/production_state";
 import { FirebaseError } from "firebase/app";
+import type { UserAddress } from "$lib/Types/user_settings";
+import type { FetchUserAddressesResult } from "$lib/Types/networking";
 
 const parseSnapshotDataAsOrder = (snapshot: QuerySnapshot): Order[] => {
   const orders = snapshot.docs.map((doc) => {
@@ -215,3 +217,52 @@ export const fetchMealRecipientInfo = async (
     throw error;
   }
 };
+
+
+export const fetchUserAddresses =  async (firestore: Firestore, userUUID: string) : Promise<FetchUserAddressesResult> => {
+  try {
+
+    if (!userUUID) {
+      throw new Error("User UUID is required");
+    }
+
+    const docPath = collection(firestore, `Users/${userUUID}/addresses`);
+    const snapshot = await getDocs(docPath);
+    let addresses = snapshot.docs.map((doc) => {
+      const addressData = doc.data();
+      const address: UserAddress = {
+        isDefault: addressData.isDefault,
+        city: addressData.city,
+        postalCode: addressData.postalCode,
+        province: addressData.province,
+        street: addressData.street,
+        suburb: addressData.suburb,
+      };
+      return address;
+    });
+
+    if (!PUBLIC_PRODUCTION) {
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+    }
+
+    const defaultAddress = addresses.find((address) => address.isDefault);
+    addresses = addresses.filter((address) => !address.isDefault);
+
+    return {
+      defaultAddress: defaultAddress || addresses[0],
+      addresses,
+    };
+  } catch (error) {
+    if (error instanceof FirebaseError) {
+      switch (error.code) {
+        case "permission-denied":
+          throw new Error("You do not have permission to view these addresses");
+        case "not-found":
+          throw new Error("Addresses not found in the database.");
+        default:
+          throw new Error("Failed to fetch addresses.");
+      }
+    }
+    throw error;
+  }
+}

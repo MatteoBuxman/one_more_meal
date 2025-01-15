@@ -1,40 +1,23 @@
 <script lang="ts">
-  import { Home, Plus } from "lucide-svelte";
-  import MenuPopup from "$lib/Components/Utilities/menu_popup.svelte";
-  import DashboardMealManager from "$lib/Components/Features/Dashboard/dashboard_meal_manager.svelte";
+  import { Plus } from "lucide-svelte";
+  import DashboardMealManager from "$lib/components/Features/Dashboard/dashboard_meal_manager.svelte";
   import type { PageData } from "./$types";
-  import LoadingBar from "$lib/Components/Utilities/loading_bar.svelte";
-  import ErrorModal from "$lib/Components/Errors/error_modal.svelte";
+  import LoadingBar from "$lib/components/Utilities/loading_bar.svelte";
+  import ErrorModal from "$lib/components/Errors/error_modal.svelte";
+  import { useAuthStore } from "$lib/Firebase/firebase_init";
 
   let { data }: { data: PageData } = $props();
 
-  let menu_configuration = [
-    {
-      name: "Profile",
-      href: "/profile",
-    },
-    {
-      name: "Settings",
-      href: "/settings",
-    },
-    {
-      name: "Logout",
-      href: "/logout",
-    },
-  ];
+  const auth = useAuthStore();
+
 </script>
 
-<div class="max-w-2xl mx-auto p-4 space-y-5 min-h-[800px]">
-  <!-- Header -->
-  <div class="flex justify-between items-center mb-6" id="dashboard_nav">
-    <div class="flex items-center space-x-2">
-      <Home size={24} class="text-gray-700" />
-      <h1 class="text-xl font-semibold">Hi, Matteo.</h1>
-    </div>
-    <MenuPopup {menu_configuration} />
-  </div>
+<div class="max-w-2xl w-full px-4 mx-auto mt-4 space-y-5 min-h-[800px]">
 
-  <p class="text-gray-600 mb-6">See your meal donation history below.</p>
+  <div class="flex flex-col gap-1">
+    <h1 class="font-bold text-lg">Welcome, {$auth.user?.displayName}.</h1>
+    <p class="text-gray-500 text-sm">See your meal donation history below.</p>
+  </div>
 
   <!-- New Meal Button -->
   <div class="flex justify-between items-center mb-4">

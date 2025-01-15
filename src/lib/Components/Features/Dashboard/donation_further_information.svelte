@@ -9,7 +9,7 @@
   import type { Meal, MealsWithRecipients } from "$lib/Types/meals";
   import OrderStateBadge from "./order_state_badge.svelte";
   import { Clock } from "lucide-svelte";
-  import ErrorBadge from "$lib/Components/Errors/error_badge.svelte";
+  import ErrorBadge from "$lib/components/Errors/error_badge.svelte";
 
   let { order, meals }: { order: Order; meals: Meal[] } = $props();
 
@@ -27,25 +27,6 @@
   }
 </script>
 
-<!-- Header -->
-<div class="p-4 border-b border-gray-200">
-  <div class="flex flex-col gap-4 justify-between items-start mb-2">
-    <div class="flex flex-col gap-1">
-      <h2 class="font-semibold text-gray-900">
-        Order <span class="font-semibold font-mono">#{order.id}</span>
-      </h2>
-      <div class="flex items-center gap-2 text-sm text-gray-500">
-        <Clock size={18} class="text-gray-500" />
-        <span>{formatDate((order.created_at) as number)}</span>
-      </div>
-    </div>
-
-    <OrderStateBadge status={order.status} />
-  </div>
-  <p class="text-xs text-gray-600">
-    Click on a meal ID to see the person who recieved your meal.
-  </p>
-</div>
 
 <!-- Content -->
 {#await fetchRecipientInfo()}

@@ -135,9 +135,8 @@
   }
 </script>
 
-<div class="relative">
-  <div class="fixed inset-0 bg-white -z-10">
-    <div class="relative h-full w-full">
+
+    <div class="absolute inset-0">
       <!-- Scanner Viewport -->
       <div
         class="absolute inset-0 flex flex-col gap-4 items-center justify-center"
@@ -232,8 +231,7 @@
         </p>
       </div>
     </div>
-  </div>
-</div>
+
 
 <style>
   /* Scanning animation */

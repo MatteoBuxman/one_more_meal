@@ -1,16 +1,17 @@
 <script lang="ts">
-  import MenuPopup from "$lib/Components/Utilities/menu_popup.svelte";
-  import OneMoreMealPackagingFlow from "$lib/Components/Features/NewOrder/one_more_meal_packaging_flow.svelte";
-  import ContextProvider from "$lib/Components/Utilities/context_provider.svelte";
+  import MenuPopup from "$lib/components/Utilities/menu_popup.svelte";
+  import OneMoreMealPackagingFlow from "$lib/components/Features/NewOrder/one_more_meal_packaging_flow.svelte";
+  import ContextProvider from "$lib/components/Utilities/context_provider.svelte";
   import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
   import { QrCode, AlertCircle } from "lucide-svelte";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
-  import LoadingBar from "$lib/Components/Utilities/loading_bar.svelte";
+  import LoadingBar from "$lib/components/Utilities/loading_bar.svelte";
   import { v4 } from "uuid";
-  import ModalPopupMobile from "$lib/Components/Utilities/modal_popup_mobile.svelte";
-  import GenerateQrcodes from "$lib/Components/Features/NewOrder/generate_qrcodes.svelte";
+  import ModalPopupMobile from "$lib/components/Utilities/modal_popup_mobile.svelte";
+  import GenerateQrcodes from "$lib/components/Features/NewOrder/generate_qrcodes.svelte";
   import { page } from "$app/stores";
+  import Button from "$lib/components/ui/button/button.svelte";
 
   const menu_configuration = [
     { name: "Dashboard", link: "/dashboard" },
@@ -77,16 +78,7 @@
   });
 </script>
 
-<nav class="navbar p-4">
-  <div class="flex flex-1">
-    <img src="/main_logo_pinkaccent.png" alt="logo_image" class="w-7" />
-    <div class="divider divider-horizontal m-0"></div>
-    <a class="text-xl font-lexend" aria-label="home_link" href="/"
-      >Add New Meal</a
-    >
-  </div>
-  <MenuPopup {menu_configuration} />
-</nav>
+
 
 <div class="max-w-md mx-auto p-4 space-y-6">
   <p class="text-sm text-gray-500">
@@ -159,19 +151,15 @@
       <GenerateQrcodes />
     </ModalPopupMobile>
 
-    <button
+    <Button
       onclick={handleContinue}
       type="button"
-      class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white rounded-lg py-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      class="w-full"
       disabled={contextState.addedMeals.length === 0}
     >
       Continue
-    </button>
+    </Button>
   </div>
 </div>
 
-<style>
-  .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200;
-  }
-</style>
+

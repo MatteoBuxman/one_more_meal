@@ -1,4 +1,59 @@
 <script lang="ts">
+  import * as Sheet from "$lib/components/ui/sheet/index";
+  import type { Snippet } from "svelte";
+
+  type ModalProps = {
+    isOpen: boolean;
+    title?: string;
+    onOpen?: () => void;
+    onClose?: () => void;
+    header?: Snippet;
+    children?: Snippet;
+    footer?: Snippet;
+    destroyChildrenOnClose?: boolean;
+  };
+
+  let {
+    isOpen = $bindable(),
+    onOpen,
+    onClose,
+    title,
+    header,
+    children,
+    footer,
+    //By default the modal and its children are never removed from the DOM.
+    destroyChildrenOnClose = false,
+  }: ModalProps = $props();
+
+  function onOpenChange(isOpen: boolean) {
+    if (isOpen) {
+      onOpen?.();
+    } else {
+      onClose?.();
+    }
+  }
+</script>
+
+<Sheet.Root bind:open={isOpen} {onOpenChange}>
+  <Sheet.Content side="bottom" class="h-[85vh] overflow-y-scroll">
+    <Sheet.Header class="text-left">
+      {#if title}
+      <Sheet.Title>{title}</Sheet.Title>
+      {/if}
+      {@render header?.()}
+      <Sheet.Description>
+        {#if !destroyChildrenOnClose || isOpen}
+          {@render children?.()}
+        {/if}
+      </Sheet.Description>
+    </Sheet.Header>
+    <Sheet.Footer>
+      {@render footer?.()}
+    </Sheet.Footer>
+  </Sheet.Content>
+</Sheet.Root>
+
+<!-- <script lang="ts">
   import { X } from "lucide-svelte";
   import type { Snippet } from "svelte";
 
@@ -56,7 +111,7 @@
       </div>
     </form>
     <div>
-     <!-- Logic to implement the destroyChildrenOnClose logic -->
+     
       {#if !destroyChildrenOnClose || isOpen}
         {@render children()}
       {/if}
@@ -65,4 +120,4 @@
   <form method="dialog" class="modal-backdrop">
     <button>close</button>
   </form>
-</dialog>
+</dialog> -->

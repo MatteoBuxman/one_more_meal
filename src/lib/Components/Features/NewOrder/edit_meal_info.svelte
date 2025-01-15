@@ -3,6 +3,11 @@
   import { getContext } from "svelte";
   import ModalPopupMobile from "../../Utilities/modal_popup_mobile.svelte";
   import { clampString } from "$lib/Logic/clamp_string";
+  import Badge from "$lib/components/ui/badge/badge.svelte";
+  import Label from "$lib/components/ui/label/label.svelte";
+  import Input from "$lib/components/ui/input/input.svelte";
+  import Textarea from "$lib/components/ui/textarea/textarea.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
 
   const contextState = getContext<OneMoreMealPackagingFlowState>(
     "add_meal_flow_state"
@@ -75,61 +80,60 @@
 </script>
 
 <ModalPopupMobile bind:isOpen onClose={exitClose}>
-  <div class="space-y-4 mt-6 px-5">
-    <h1 class="font-bold text-xl">Edit.</h1>
-    <div class="flex flex-col gap-2">
-      <h2 class="text-sm">Meal IDs</h2>
-      <div class="grid grid-cols-3 gap-2">
-        {#each meal_configuration.ids as uuid}
-          <span class="badge badge-primary text-xs">
-            {clampString(uuid, 8)}
-          </span>
-        {/each}
+  
+    {#snippet header()}
+      <h1 class="font-bold text-black text-xl">Edit.</h1>
+      <div class="flex flex-col gap-2">
+        <h2 class="text-sm">Meal IDs</h2>
+        <div class="grid grid-cols-3 gap-2">
+          {#each meal_configuration.ids as uuid}
+            <Badge variant="outline" class="text-sm">
+              {clampString(uuid, 8)}
+            </Badge>
+          {/each}
+        </div>
       </div>
-    </div>
+    {/snippet}
 
-    <form onsubmit={handleUpdate} class="space-y-6">
+    <form onsubmit={handleUpdate} class="space-y-6 mt-4">
       <div class="space-y-2">
-        <label class="font-medium text-gray-700"
+        <Label class="font-medium text-gray-700"
           >Meal Name
-          <input
+          <Input
             onkeydown={markHasChanged}
             type="text"
             bind:value={localName}
-            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="mt-2"
             placeholder="Enter the meal name"
             required
           />
-        </label>
+        </Label>
       </div>
 
       <div class="space-y-2">
-        <label class="font-medium text-gray-700"
+        <Label class="font-medium text-gray-700"
           >Description (Optional)
-          <textarea
+          <Textarea
             onkeydown={markHasChanged}
             bind:value={localDescription}
-            class="text-sm w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="mt-2 text-sm"
             placeholder="Add a description"
-            rows="4"
-          ></textarea>
-        </label>
+          ></Textarea>
+        </Label>
       </div>
 
       <div class="space-y-2">
-        <p class="text-sm">{localAmount} meals.</p>
+        <p class="text-sm text-black font-bold">{localAmount} meals.</p>
       </div>
 
-      <button
+      <Button
         type="submit"
-        class="w-full py-3 text-white font-medium rounded-lg transition-colors"
-        class:bg-red-500={!hasChanged}
-        class:bg-red-600={!hasChanged && ":hover"}
-        class:bg-indigo-600={hasChanged}
-        class:bg-indigo-700={hasChanged && ":hover"}
+        class="w-full py-3 text-white font-medium rounded-lg transition-colors {hasChanged ? 'bg-indigo-700 hover:bg-indigo-800' : 'bg-red-700 hover:bg-red-800'}"
       >
         {hasChanged ? "Save Changes" : "Delete"}
-      </button>
+      </Button>
+      
+        
     </form>
-  </div>
+  
 </ModalPopupMobile>

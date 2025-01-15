@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ProtectedRoute from "$lib/Components/Utilities/protected_route.svelte";
+  import ProtectedRoute from "$lib/components/Utilities/protected_route.svelte";
 
   
 

@@ -1,33 +1,37 @@
 <script lang="ts">
   import {
-    ArrowLeft,
     User,
     Clock,
     ChevronRight,
     CreditCard,
-    Pencil,
     LoaderPinwheel,
+    MapPin,
+    ChevronDown,
   } from "lucide-svelte";
 
-  import RandomFoodIcon from "$lib/Components/Utilities/random_food_icon.svelte";
-
+  import RandomFoodIcon from "$lib/components/Utilities/random_food_icon.svelte";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index";
   import { page } from "$app/stores";
   import type { Meal } from "$lib/Types/meals";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import type { OrderWithMeals } from "$lib/Types/orders";
   import { postOrder } from "$lib/Firebase/Firestore/post_data";
-  import { useFirestore } from "$lib/Firebase/firebase_init";
-  import ErrorModal from "$lib/Components/Errors/error_modal.svelte";
+  import { useAuthStore, useFirestore } from "$lib/Firebase/firebase_init";
+  import ErrorModal from "$lib/components/Errors/error_modal.svelte";
   import { Timestamp } from "firebase/firestore";
-
-  let userName = "Matteo Buxman";
-  let userPhone = "082 611 0091";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import Card from "$lib/components/ui/card/card.svelte";
+  import ModalPopupMobile from "$lib/components/Utilities/modal_popup_mobile.svelte";
+  import LoadingBar from "$lib/components/Utilities/loading_bar.svelte";
+  import type { FetchUserAddressesResult } from "$lib/Types/networking";
 
   let addedMeals: Meal[] = $state([]);
   let orderID: string;
   let isSubmitting = $state(false);
   let submissionError = $state(false);
+  let deliveryInfo = $state(false);
+  let pickupTime = $state(false);
 
   const firestore = useFirestore();
 
@@ -60,7 +64,7 @@
   async function handleComplete() {
     isSubmitting = true;
 
-    const order : OrderWithMeals = {
+    const order: OrderWithMeals = {
       id: orderID,
       meals: addedMeals,
       status: "ordered",
@@ -80,6 +84,11 @@
       submissionError = true;
     }
   }
+
+  const auth = useAuthStore();
+
+  let addressesProm: Promise<FetchUserAddressesResult> =
+    $page.data.userAddresses;
 </script>
 
 <ErrorModal
@@ -87,26 +96,24 @@
   bind:isOpen={submissionError}
 />
 
-<div>
+<div class="p-3">
+  <Button onclick={handleReturn} class="w-full">Go Back</Button>
+</div>
+
+<div class="mt-2">
   <!-- Header -->
   <div
     class="p-3 flex items-center justify-between bg-white/80 backdrop-blur-sm sticky top-0 z-10"
   >
-    <div class="flex items-center space-x-4">
-      <button
-        onclick={handleReturn}
-        class="hover:bg-gray-100 p-2 rounded-full transition-colors"
-      >
-        <ArrowLeft class="w-5 h-5" />
-      </button>
-      <h1 class="text-xl font-bold">Complete Pickup</h1>
+    <div class="flex flex-col justify-between">
+      <h1 class="text-lg font-bold">Complete Meal Pickup Request</h1>
     </div>
   </div>
 
   <!-- New Contact Information Section -->
   <div class="px-4 mt-6">
     <div
-      class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-4"
+      class="bg-white rounded shadow-sm border border-gray-100 p-4 space-y-4"
     >
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -116,21 +123,86 @@
             <User class="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h3 class="font-medium">{userName}</h3>
-            <p class="text-sm text-gray-500">{userPhone}</p>
+            <h3 class="font-medium">{$auth.user?.displayName}</h3>
+            <p class="text-sm text-gray-500">{$auth.user?.email}</p>
+            <p class="text-sm text-gray-500">{$auth.user?.phoneNumber}</p>
           </div>
         </div>
-        <button class="p-2 hover:bg-gray-100 rounded-full transition-colors">
-          <Pencil class="w-4 h-4 text-gray-400" />
-        </button>
       </div>
     </div>
   </div>
 
   <!-- Store Info Card -->
-  <div
-    class="mx-4 mt-6 bg-white rounded-b-2xl shadow-lg border border-gray-100"
-  >
+  <div class="mx-4 mt-6 bg-white rounded-b shadow-lg border border-gray-100">
+    {#await addressesProm}
+      <LoadingBar />
+    {:then addresses}
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger class="w-full mb-">
+          <Card class=" p-4 shadow-lg">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div
+                  class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center"
+                >
+                  <MapPin class="h-5 w-5 text-blue-600" />
+                </div>
+                <div class="text-left">
+                  <h3 class="font-medium text-sm">
+                    {addresses.defaultAddress.street}
+                  </h3>
+                  <h3 class="font-medium text-sm">
+                    {addresses.defaultAddress.suburb +
+                      ", " +
+                      addresses.defaultAddress.province +
+                      ", " +
+                      addresses.defaultAddress.postalCode}
+                  </h3>
+                </div>
+              </div>
+              <ChevronDown class="h-5 w-5 text-muted-foreground" />
+            </div>
+          </Card>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content class="w-[375px]">
+          <DropdownMenu.Group>
+            <DropdownMenu.GroupHeading
+              >Saved Locations</DropdownMenu.GroupHeading
+            >
+            <DropdownMenu.Separator />
+            {#each addresses.addresses as address}
+              <DropdownMenu.Item>
+                
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center"
+                      >
+                        <MapPin class="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div class="text-left">
+                        <h3 class="font-medium text-sm">
+                          {address.street}
+                        </h3>
+                        <h3 class="font-medium text-sm">
+                          {address.suburb +
+                            ", " +
+                            address.province +
+                            ", " +
+                            address.postalCode}
+                        </h3>
+                      </div>
+                    </div>
+                    
+                  </div>
+                
+              </DropdownMenu.Item>
+            {/each}
+          </DropdownMenu.Group>
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    {/await}
+
     <div class="bg-gray-100">
       <iframe
         class="w-full h-64"
@@ -153,12 +225,13 @@
 
   <!-- Pickup Time Section -->
   <div class="px-3 mt-6">
-    <a
-      class="w-full bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center justify-between"
-      href="/pickupinformation"
+    <Card
+      class="w-full bg-white rounded p-4 shadow-sm border border-gray-100 flex items-center justify-between"
+      onclick={() => {
+        pickupTime = true;
+      }}
     >
       <div class="flex items-center gap-3">
-        <Clock class="w-5 h-5 text-gray-500 shrink-0" />
         <div class="text-left">
           <p class="font-medium">Pickup time</p>
           <p class="text-sm text-gray-600">
@@ -167,17 +240,18 @@
         </div>
       </div>
       <ChevronRight class="w-5 h-5 text-gray-400 shrink-0" />
-    </a>
+    </Card>
   </div>
 
   <!-- Costs Section -->
   <div class="px-3 mt-6">
-    <a
-      class="w-full bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center justify-between"
-      href="/pickupinformation"
+    <Card
+      class="w-full bg-white rounded p-4 shadow-sm border border-gray-100 flex items-center justify-between"
+      onclick={() => {
+        deliveryInfo = true;
+      }}
     >
       <div class="flex items-center gap-3">
-        <Clock class="w-5 h-5 text-gray-500 shrink-0" />
         <div class="text-left">
           <p class="font-medium">Delivery Costs</p>
           <p class="text-sm text-gray-600">
@@ -187,12 +261,12 @@
         </div>
       </div>
       <ChevronRight class="w-5 h-5 text-gray-400 shrink-0" />
-    </a>
+    </Card>
   </div>
 
   <!-- Order Summary -->
   <div class="px-3 mt-6">
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+    <div class="bg-white rounded shadow-sm border border-gray-100 p-4">
       <h2 class="text-lg font-bold mb-4">Order Summary</h2>
       <div class="flex flex-col gap-3">
         {#if addedMeals.length === 0}
@@ -219,9 +293,9 @@
   </div>
 
   <!-- Price & Payment -->
-  <div class="px-6 mt-4">
+  <div class="px-3 mt-4">
     <div
-      class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-3"
+      class="bg-white rounded shadow-sm border border-gray-100 p-4 space-y-3"
     >
       <div class="flex justify-between items-center">
         <span class="text-gray-600">Subtotal</span>
@@ -237,9 +311,9 @@
       </div>
     </div>
 
-    <button
+    <Button
       onclick={handleComplete}
-      class="text-center w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-light shadow-sm transition-all active:scale-[0.98]"
+      class="text-center w-full mt-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 font-light shadow-sm transition-all active:scale-[0.98]"
     >
       {#if isSubmitting}
         <div class="text-white flex items-center justify-center gap-2">
@@ -249,7 +323,7 @@
       {:else}
         <p>Complete Order</p>
       {/if}
-    </button>
+    </Button>
 
     <div
       class="flex items-center justify-center gap-2 mt-4 mb-8 text-sm text-gray-500"
@@ -259,6 +333,18 @@
     </div>
   </div>
 </div>
+
+<ModalPopupMobile bind:isOpen={deliveryInfo}>
+  {#snippet header()}
+    <h1 class="font-bold text-black">Delivery Costs.</h1>
+  {/snippet}
+</ModalPopupMobile>
+
+<ModalPopupMobile bind:isOpen={pickupTime}>
+  {#snippet header()}
+    <h1 class="font-bold text-black">Pickup Time.</h1>
+  {/snippet}
+</ModalPopupMobile>
 
 <style>
 </style>

@@ -14,7 +14,7 @@
 
   $effect(() => {
     if (!$auth.loading && !$auth.error && !$auth.user) {
-      goto("/?signin=true");
+      goto("/signin");
     }
   });
 </script>

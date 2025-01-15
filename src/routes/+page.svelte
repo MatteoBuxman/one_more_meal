@@ -1,8 +1,12 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import Card from "$lib/Components/Static/HomePage/home_page_card.svelte";
-  import MenuPopup from "$lib/Components/Utilities/menu_popup.svelte";
-  import ModalPopupMobile from "$lib/Components/Utilities/modal_popup_mobile.svelte";
+  import LoginForm from "$lib/components/login-form.svelte";
+  import LoginPage from "$lib/components/login-page.svelte";
+  import Card from "$lib/components/Static/HomePage/home_page_card.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import MenuPopup from "$lib/components/Utilities/menu_popup.svelte";
+  import ModalPopupMobile from "$lib/components/Utilities/modal_popup_mobile.svelte";
+
   import { onMount } from "svelte";
 
   const card_information = [
@@ -34,31 +38,12 @@
     { name: "Contact", link: "/contact" },
   ];
 
-  let showSignIn = $state(false);
-
-  onMount(() => {
-    const signIn = Boolean($page.url.searchParams.get("signin"));
-    showSignIn = signIn;
-  });
+ 
 </script>
 
-<!-- DaisyUI Modal -->
-<ModalPopupMobile bind:isOpen={showSignIn}>
-  <h1>Sign in</h1>
-</ModalPopupMobile>
-
 <div>
-  <nav class="navbar p-4">
-    <div class="flex-1">
-      <img src="/main_logo_pinkaccent.png" alt="logo_image" class="w-7" />
-      <a class="text-xl font-lexend p-3" aria-label="home_link" href="/"
-        >One More Meal</a
-      >
-    </div>
-    <MenuPopup {menu_configuration} />
-  </nav>
   <div id="hero_landing_section" class="p-5">
-    <section class="homepage-section flex flex-col h-full justify-between">
+    <section class="homepage-section flex flex-col h-full justify-between mt-5">
       <div class="flex flex-col gap-10">
         <h1 class="font-bold font-lexend text-5xl">
           How about <span class="text-[#F9D200]">feeding</span> one more person while
@@ -69,7 +54,7 @@
           of your own home.
         </h2>
       </div>
-      <a class="btn btn-secondary" href="/dashboard">I want to help.</a>
+      <Button>I want to help</Button>
     </section>
   </div>
   <div class="p-5 font-lexend flex flex-col gap-5">

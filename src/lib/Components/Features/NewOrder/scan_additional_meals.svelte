@@ -1,6 +1,6 @@
 <script lang="ts">
-  import ModalPopupMobile from "$lib/Components/Utilities/modal_popup_mobile.svelte";
-  import ScanQrcode from "$lib/Components/Features/NewOrder/scan_qr code.svelte";
+  import ModalPopupMobile from "$lib/components/Utilities/modal_popup_mobile.svelte";
+  import ScanQrcode from "$lib/components/Features/NewOrder/scan_qr code.svelte";
 
   let {
     firstID,
@@ -53,10 +53,10 @@
   onClose={resetState}
 >
   <div class="p-3 flex flex-col">
-    <h2>{position + 1} of {quantity - 1}.</h2>
+    <h2 class="text-sm font-bold text-black">Extra meal {position + 1} of {quantity - 1}.</h2>
     <!-- Already been scanned -->
     {#if scanError}
-      <div class="text-red-500">
+      <div class="text-red-500 text-sm font-bold mt-3">
         This code has already been scanned. Please scan a new meal.
       </div>
     {/if}

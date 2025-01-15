@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { Check, CircleX, Clock } from "lucide-svelte";
-
+  import Badge from "$lib/components/ui/badge/badge.svelte";
 
     type Statuses = 'ordered' | 'picked_up' | 'completed' | 'cancelled';
 
@@ -19,29 +18,21 @@
         }
     }
 
-    function getStyle(){
+    function getVariant(){
         switch(status){
-            case 'ordered':
-                return 'bg-yellow-500';
+            case "ordered":
+                return 'secondary';
             case 'picked_up':
-                return 'bg-blue-500';
+                return 'outline';
             case 'completed':
-                return 'bg-green-500';
+                return 'default';
             case 'cancelled':
-                return 'bg-red-500';
+                return 'destructive';
         }
     }
+
+    
+    
 </script>
 
-<div class="flex gap-2 badge text-white p-3 {getStyle()}">
-        {#if status === 'ordered'}
-            <Clock size={20} />
-        {:else if status === 'picked_up'}
-            <Clock size={20} />
-        {:else if status === 'completed'}
-            <Check size={20} />
-        {:else}
-            <CircleX size={20} />
-        {/if}
-    <span class="text-xs font-bold">{getText()}</span>
-</div>
+<Badge variant={getVariant()}>{getText()}</Badge>

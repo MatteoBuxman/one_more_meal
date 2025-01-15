@@ -6,6 +6,9 @@
   import type { Order } from "$lib/Types/orders";
   import { clampString } from "$lib/Logic/clamp_string";
 
+  // Import ShadCN/Svelte Badge component
+  import { Badge } from "$lib/components/ui/badge/index";
+
   let isOpen = $state(false);
 
   let order = getContext("order") as Order;
@@ -18,73 +21,65 @@
 
 <button onclick={() => (isOpen = true)}>
   {#if orderStatus === "cancelled"}
-    <div class="flex badge badge-error text-sm gap-2">
-      <CircleX size={16} class="text-white" />
-      <span class="">
-        {clampString(mealRecipient.id, 8)}
-      </span>
-    </div>
+    <li>
+      <Badge
+        variant="destructive"
+        class="flex items-center gap-2 text-sm justify-self-end"
+      >
+        <CircleX size={16} class="text-white" />
+        <span>{clampString(mealRecipient.id, 20)}</span>
+      </Badge>
+    </li>
   {:else if orderStatus === "completed" || mealRecipient.delivered}
-    <div class="flex badge badge-success text-sm gap-2">
-      <Check size={16} class="" />
-      <span class="">
-        {clampString(mealRecipient.id, 8)}
-      </span>
-    </div>
+    <li>
+      <Badge
+        variant="default"
+        class="flex items-center gap-2 text-sm justify-self-end"
+      >
+        <Check size={16} />
+        <span>{clampString(mealRecipient.id, 20)}</span>
+      </Badge>
+    </li>
   {:else}
-    <div class="flex badge badge-warning text-sm gap-2">
-      <Clock size={16} class="" />
-      <span class="">
-        {clampString(mealRecipient.id, 8)}
-      </span>
-    </div>
+    <li class="w-full">
+      <Badge
+        variant="outline"
+        class="flex items-center gap-2 text-sm justify-self-end"
+      >
+        <Clock size={16} />
+        <span>{clampString(mealRecipient.id, 20)}</span>
+      </Badge>
+    </li>
   {/if}
 </button>
 
-<ModalPopupMobile bind:isOpen destroyChildrenOnClose={true}>
-  <div class="p-6 space-y-6">
-    <div class="flex flex-col">
-      <span class="text-sm text-gray-500">Meal ID</span>
-      <span class="font-mono font-bold text-sm mt-1">{mealRecipient?.id}</span>
+<ModalPopupMobile bind:isOpen title={"Meal Information"}>
+  {#snippet header()}
+    <div class="mb-3 flex flex-col">
+      <h2>Meal #<span class="font-mono text-sm">{mealRecipient.id}</span></h2>
     </div>
-    <div class="flex items-center space-x-2">
-      <span
-        class={`px-2.5 py-0.5 rounded-full text-sm font-medium
-            ${mealRecipient.delivered ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
-      >
-        {mealRecipient.delivered ? "Delivered" : "Pending"}
-      </span>
+    <div class="mb-5">
+      {#if mealRecipient.delivered}
+        <Badge variant="default">Delivered</Badge>
+      {:else if orderStatus === "cancelled"}
+        <Badge variant="destructive">Cancelled</Badge>
+      {:else}
+      <Badge variant="outline">Pending</Badge>
+      {/if}
     </div>
+  {/snippet}
 
+  <div class="mt-3">
     {#if mealRecipient.delivered}
-      <div class="space-y-4">
-        <div>
-          <div class="text-sm font-medium text-gray-500">Recipient</div>
-          <div class="mt-1 text-lg">
-            {mealRecipient.recipientName}
-            {mealRecipient.recipientSurname}
-          </div>
-        </div>
+      <div class="mb-5">
+        <h1 class="text-lg text-black">Recieved by <span class="font-bold">{mealRecipient.recipientName}</span></h1>
       </div>
-    {/if}
-
-    {#if mealRecipient?.acceptanceImgURL}
-      <div class="space-y-2">
-        <div class="text-sm font-medium text-gray-500">Acceptance Photo</div>
-        <div class="relative rounded-lg overflow-hidden bg-gray-100">
-          <img
-            src={mealRecipient.acceptanceImgURL}
-            alt="Delivery acceptance"
-            class="object-cover"
-          />
-        </div>
-      </div>
-    {/if}
-
-    {#if !mealRecipient.delivered}
-      <div class="text-sm text-gray-500 italic">
-        Recipient information will be available after delivery
-      </div>
+      <img class="rounded-sm" src={mealRecipient.acceptanceImgURL} alt="Recipient's meal acceptance" />
+    {:else if orderStatus === "cancelled"}
+      <h1>Your order was cancelled</h1>
+    {:else}
+    <h1>Your meal has not been distributed yet.</h1>
     {/if}
   </div>
+  
 </ModalPopupMobile>

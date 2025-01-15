@@ -2,6 +2,12 @@
   import type { Meal, OneMoreMealPackagingFlowState } from "$lib/Types/meals";
   import { getContext } from "svelte";
   import ScanAdditionalMeals from "./scan_additional_meals.svelte";
+  import Badge from "$lib/components/ui/badge/badge.svelte";
+  import Label from "$lib/components/ui/label/label.svelte";
+  import Input from "$lib/components/ui/input/input.svelte";
+  import Textarea from "$lib/components/ui/textarea/textarea.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import Slider from "$lib/components/ui/slider/slider.svelte";
 
   let flowState = getContext<OneMoreMealPackagingFlowState>(
     "add_meal_flow_state"
@@ -40,25 +46,21 @@
 </script>
 
 <!-- Form Content -->
-<form class="space-y-6 px-5" onsubmit={handleAddMeal}>
-  <div
-    class="inline-flex mt-3 px-3 py-1 rounded-full bg-gray-100 text-sm text-gray-700"
-  >
-    Meal ID: {ids[0]}
-  </div>
+<form class="space-y-6" onsubmit={handleAddMeal}>
+  <Badge variant="outline">Meal #{ids[0]}</Badge>
 
   <div class="space-y-4">
     <div>
-      <label
+      <Label
         for="mealName"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
         Meal Name
-      </label>
-      <input
+    </Label>
+      <Input
         id="mealName"
         type="text"
-        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        
         placeholder="Enter the meal name"
         bind:value={mealData.name}
         required
@@ -66,32 +68,35 @@
     </div>
 
     <div>
-      <label
+      <Label
         for="description"
         class="block text-sm font-medium text-gray-700 mb-1"
       >
         Description (Optional)
-      </label>
-      <textarea
+      </Label>
+      <Textarea
         id="description"
-        class="text-sm w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[100px] resize-none"
+        
         placeholder="Add a description"
         bind:value={mealData.description}
-      ></textarea>
+      ></Textarea>
     </div>
 
-    <div>
-      <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">
-        Amount of Meals
-      </label>
-      <input
-        id="amount"
-        type="number"
-        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        min="1"
-        bind:value={mealData.quantity}
-        required
-      />
+    <div class="w-full">
+      <Label for="amount" class="block text-sm font-medium text-gray-700 mb-1">
+        How many {mealData.name  ? mealData.name + 's' : "meals"} ?
+      </Label>
+      <div class="p-3 mx-auto">
+        <Slider type="single" bind:value={mealData.quantity} max={6} min={1} step={1}  />
+        <div class="flex w-full justify-between text-xs mt-4">
+          <span>1</span>
+          <span>2</span>
+          <span>3</span>
+          <span>4</span>
+          <span>5</span>
+          <span>6</span>
+        </div>
+      </div>
       {#if mealData.quantity > 1}
         <p class="text-xs mt-2 text-gray-500">
           You will be required to scan the QR codes of the additional meals.
@@ -100,12 +105,12 @@
     </div>
   </div>
 
-  <button
+  <Button
     type="submit"
-    class="w-full py-2 px-4 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+    class="w-full"
   >
-    Add {mealData.quantity > 1 ? "Meals" : "Meal"}
-  </button>
+    Add {mealData.quantity} {mealData.name ? mealData.name : mealData.quantity > 1 ? "Meals" : "Meal"}
+</Button>
 </form>
 
 <!-- Popup to handle additional scans if there is more than one of a particular meal -->
