@@ -1,4 +1,7 @@
 export interface UserAddress {
+    addressId: string;
+    name: string;
+    phoneNumber: string;
     isDefault: boolean;
     city: string;
     postalCode: string;

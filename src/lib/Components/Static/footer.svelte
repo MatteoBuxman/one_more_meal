@@ -47,7 +47,7 @@
             </div>
             <div class="flex items-center space-x-2">
               <MapPin class="w-4 h-4" />
-              <span class="text-sm">123 Business St, City, Country</span>
+              <span class="text-sm">4 Nursery Road, Rondebosch, Cape Town</span>
             </div>
           </div>
         </div>

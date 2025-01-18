@@ -4,16 +4,15 @@
   import type { PageData } from "./$types";
   import LoadingBar from "$lib/components/Utilities/loading_bar.svelte";
   import ErrorModal from "$lib/components/Errors/error_modal.svelte";
-  import { useAuthStore } from "$lib/Firebase/firebase_init";
+  import { firestore, useAuthStore } from "$lib/Firebase/firebase_init";
+  import { fetchUserCompletedOrders, fetchUserOpenOrders } from "$lib/Firebase/Firestore/fetch_data";
 
   let { data }: { data: PageData } = $props();
 
   const auth = useAuthStore();
-
 </script>
 
 <div class="max-w-2xl w-full px-4 mx-auto mt-4 space-y-5 min-h-[800px]">
-
   <div class="flex flex-col gap-1">
     <h1 class="font-bold text-lg">Welcome, {$auth.user?.displayName}.</h1>
     <p class="text-gray-500 text-sm">See your meal donation history below.</p>
@@ -31,39 +30,41 @@
     </a>
   </div>
 
-  
+  {#if $auth.user}
+    {#await fetchUserOpenOrders(firestore, $auth.user.uid)}
+      <LoadingBar />
+    {:then orders}
+      {#if orders.length > 0}
+        <DashboardMealManager {orders} />
+      {:else}
+        <p class="text-sm text-gray-400">
+          You have no open orders. Create a new one above!
+        </p>
+      {/if}
+    {:catch error}
+      <p class="text-red-400 font-bold text-sm">Could not fetch open orders.</p>
+      <ErrorModal error_message={error.message} />
+    {/await}
 
-  {#await data.openOrders}
-    <LoadingBar />
-  {:then orders}
-    {#if orders.length > 0}
-      <DashboardMealManager {orders} />
-    {:else}
-      <p class="text-sm text-gray-400">
-        You have no open orders. Create a new one above!
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="font-semibold">Completed Donations.</h2>
+    </div>
+
+    {#await fetchUserCompletedOrders(firestore, $auth.user.uid)}
+      <LoadingBar />
+    {:then orders}
+      {#if orders.length > 0}
+        <DashboardMealManager {orders} />
+      {:else}
+        <p class="text-sm text-gray-400">
+          You have not completed any donations yet.
+        </p>
+      {/if}
+    {:catch error}
+      <p class="text-red-400 font-bold text-sm">
+        Could not fetch completed orders.
       </p>
-    {/if}
-  {:catch error}
-    <p class="text-red-400 font-bold text-sm">Could not fetch open orders.</p>
-    <ErrorModal error_message={error.message} />
-  {/await}
-
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="font-semibold">Completed Donations.</h2>
-  </div>
-
-  {#await data.completedOrders}
-    <LoadingBar />
-  {:then orders}
-    {#if orders.length > 0}
-      <DashboardMealManager {orders} />
-    {:else}
-      <p class="text-sm text-gray-400">
-        You have not completed any donations yet.
-      </p>
-    {/if}
-  {:catch error}
-    <p class="text-red-400 font-bold text-sm">Could not fetch completed orders.</p>
-    <ErrorModal error_message={error.message} />
-  {/await}
+      <ErrorModal error_message={error.message} />
+    {/await}
+  {/if}
 </div>

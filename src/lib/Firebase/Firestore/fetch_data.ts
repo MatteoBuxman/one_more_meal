@@ -16,7 +16,6 @@ import {
 import { PUBLIC_PRODUCTION } from "$lib/Logic/production_state";
 import { FirebaseError } from "firebase/app";
 import type { UserAddress } from "$lib/Types/user_settings";
-import type { FetchUserAddressesResult } from "$lib/Types/networking";
 
 const parseSnapshotDataAsOrder = (snapshot: QuerySnapshot): Order[] => {
   const orders = snapshot.docs.map((doc) => {
@@ -219,7 +218,7 @@ export const fetchMealRecipientInfo = async (
 };
 
 
-export const fetchUserAddresses =  async (firestore: Firestore, userUUID: string) : Promise<FetchUserAddressesResult> => {
+export const fetchUserAddresses =  async (firestore: Firestore, userUUID: string) : Promise<UserAddress[]> => {
   try {
 
     if (!userUUID) {
@@ -231,6 +230,9 @@ export const fetchUserAddresses =  async (firestore: Firestore, userUUID: string
     let addresses = snapshot.docs.map((doc) => {
       const addressData = doc.data();
       const address: UserAddress = {
+        addressId: doc.id,
+        name: addressData.name,
+        phoneNumber: addressData.phoneNumber,
         isDefault: addressData.isDefault,
         city: addressData.city,
         postalCode: addressData.postalCode,
@@ -241,17 +243,22 @@ export const fetchUserAddresses =  async (firestore: Firestore, userUUID: string
       return address;
     });
 
-    if (!PUBLIC_PRODUCTION) {
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+    // if (!PUBLIC_PRODUCTION) {
+    //   await new Promise((resolve) => setTimeout(resolve, 1200));
+    // }
+
+    
+    //Place defaultAddress first.
+    if (addresses.length > 1) {
+      const defaultAddress = addresses.findIndex((address) => address.isDefault);
+      
+      const temp = addresses[0];
+      addresses[0] = addresses[defaultAddress];
+      addresses[defaultAddress] = temp;
     }
 
-    const defaultAddress = addresses.find((address) => address.isDefault);
-    addresses = addresses.filter((address) => !address.isDefault);
 
-    return {
-      defaultAddress: defaultAddress || addresses[0],
-      addresses,
-    };
+    return addresses;
   } catch (error) {
     if (error instanceof FirebaseError) {
       switch (error.code) {

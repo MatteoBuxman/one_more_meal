@@ -12,6 +12,7 @@
   import GenerateQrcodes from "$lib/components/Features/NewOrder/generate_qrcodes.svelte";
   import { page } from "$app/stores";
   import Button from "$lib/components/ui/button/button.svelte";
+  import Card from "$lib/components/ui/card/card.svelte";
 
   const menu_configuration = [
     { name: "Dashboard", link: "/dashboard" },
@@ -86,8 +87,7 @@
   </p>
   <!-- Main Content -->
   <div class="space-y-4">
-    <button
-      type="button"
+    <Card
       onclick={handleQRScan}
       class="w-full card p-6 flex flex-col items-center justify-center space-y-4 hover:bg-gray-50 cursor-pointer border-2 border-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
       aria-label="Scan QR code"
@@ -103,15 +103,14 @@
           Scan the QR code on your meal packaging.
         </p>
       </div>
-    </button>
+    </Card>
 
     <p class="text-sm text-gray-500">
       Click below if you need to get your meal QR codes.
     </p>
 
-    <button
+    <Card
       onclick={() => (generateQrcodes = true)}
-      type="button"
       class="w-full card p-6 flex flex-col items-center justify-center space-y-4 hover:bg-gray-50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
       aria-label="Get QR codes help"
     >
@@ -128,7 +127,7 @@
           Generate your own and apply them to your meals.
         </p>
       </div>
-    </button>
+    </Card>
 
     {#if loading}
       <LoadingBar />

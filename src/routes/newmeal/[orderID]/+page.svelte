@@ -1,16 +1,12 @@
 <script lang="ts">
   import {
     User,
-    Clock,
     ChevronRight,
     CreditCard,
     LoaderPinwheel,
-    MapPin,
-    ChevronDown,
   } from "lucide-svelte";
 
   import RandomFoodIcon from "$lib/components/Utilities/random_food_icon.svelte";
-  import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index";
   import { page } from "$app/stores";
   import type { Meal } from "$lib/Types/meals";
   import { onMount } from "svelte";
@@ -24,7 +20,8 @@
   import Card from "$lib/components/ui/card/card.svelte";
   import ModalPopupMobile from "$lib/components/Utilities/modal_popup_mobile.svelte";
   import LoadingBar from "$lib/components/Utilities/loading_bar.svelte";
-  import type { FetchUserAddressesResult } from "$lib/Types/networking";
+  import { fetchUserAddresses } from "$lib/Firebase/Firestore/fetch_data";
+  import LocationDropdownSelector from "$lib/components/Features/NewOrder/location_dropdown_selector/location_dropdown_selector.svelte";
 
   let addedMeals: Meal[] = $state([]);
   let orderID: string;
@@ -32,6 +29,7 @@
   let submissionError = $state(false);
   let deliveryInfo = $state(false);
   let pickupTime = $state(false);
+  let selectedLocationID = $state("");
 
   const firestore = useFirestore();
 
@@ -75,7 +73,7 @@
     };
 
     try {
-      await postOrder(firestore, "lXBHaMmIqs5UC11ymLT1xgTdg9lA", order);
+      await postOrder(firestore, $auth.user?.uid || '', order);
 
       sessionStorage.removeItem("mostRecentMeals");
       goto(`/newmeal/${orderID}/confirmed`);
@@ -86,9 +84,7 @@
   }
 
   const auth = useAuthStore();
-
-  let addressesProm: Promise<FetchUserAddressesResult> =
-    $page.data.userAddresses;
+  
 </script>
 
 <ErrorModal
@@ -133,95 +129,20 @@
   </div>
 
   <!-- Store Info Card -->
+
+  
+
+   {#if $auth.user}
   <div class="mx-4 mt-6 bg-white rounded-b shadow-lg border border-gray-100">
-    {#await addressesProm}
+    <h1 class="text-black font-bold p-3 text-sm">Pickup location</h1>
+    {#await fetchUserAddresses(firestore, $auth.user.uid)}
       <LoadingBar />
     {:then addresses}
-      <DropdownMenu.Root>
-        <DropdownMenu.Trigger class="w-full mb-">
-          <Card class=" p-4 shadow-lg">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div
-                  class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center"
-                >
-                  <MapPin class="h-5 w-5 text-blue-600" />
-                </div>
-                <div class="text-left">
-                  <h3 class="font-medium text-sm">
-                    {addresses.defaultAddress.street}
-                  </h3>
-                  <h3 class="font-medium text-sm">
-                    {addresses.defaultAddress.suburb +
-                      ", " +
-                      addresses.defaultAddress.province +
-                      ", " +
-                      addresses.defaultAddress.postalCode}
-                  </h3>
-                </div>
-              </div>
-              <ChevronDown class="h-5 w-5 text-muted-foreground" />
-            </div>
-          </Card>
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content class="w-[375px]">
-          <DropdownMenu.Group>
-            <DropdownMenu.GroupHeading
-              >Saved Locations</DropdownMenu.GroupHeading
-            >
-            <DropdownMenu.Separator />
-            {#each addresses.addresses as address}
-              <DropdownMenu.Item>
-                
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                      <div
-                        class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center"
-                      >
-                        <MapPin class="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div class="text-left">
-                        <h3 class="font-medium text-sm">
-                          {address.street}
-                        </h3>
-                        <h3 class="font-medium text-sm">
-                          {address.suburb +
-                            ", " +
-                            address.province +
-                            ", " +
-                            address.postalCode}
-                        </h3>
-                      </div>
-                    </div>
-                    
-                  </div>
-                
-              </DropdownMenu.Item>
-            {/each}
-          </DropdownMenu.Group>
-        </DropdownMenu.Content>
-      </DropdownMenu.Root>
+      <LocationDropdownSelector {addresses} />
     {/await}
-
-    <div class="bg-gray-100">
-      <iframe
-        class="w-full h-64"
-        title="pickup location"
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2126.998692818037!2d28.02948800375621!3d-26.134072055859445!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1e950cbd305528d3%3A0x77ff15438b3f8073!2s28%20Northumberland%20Ave%2C%20Craighall%20Park%2C%20Johannesburg%2C%202196!5e0!3m2!1sen!2sza!4v1734812803730!5m2!1sen!2sza"
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"
-      ></iframe>
-    </div>
-
-    <div class="p-4 space-y-4">
-      <div class="flex items-center gap-4 text-sm">
-        <div class="flex items-center gap-2">
-          <User class="w-4 h-4 text-gray-500" />
-          <span>1.6 km away</span>
-        </div>
-      </div>
-    </div>
+  
   </div>
+  {/if}
 
   <!-- Pickup Time Section -->
   <div class="px-3 mt-6">
