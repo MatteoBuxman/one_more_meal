@@ -3,7 +3,7 @@
   import * as Card from "$lib/components/ui/card/index";
   import { Input } from "$lib/components/ui/input/index";
   import { Label } from "$lib/components/ui/label/index";
-  import { auth } from "$lib/Firebase/firebase_init";
+  import { auth } from "$lib/firebase/firebase_init";
   import { validateUserSignIn } from "$lib/utilities/form_validation";
   import { FirebaseError } from "firebase/app";
   import { signInWithEmailAndPassword } from "firebase/auth";

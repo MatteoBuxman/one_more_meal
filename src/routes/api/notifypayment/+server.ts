@@ -1,4 +1,4 @@
-import { firestore } from "$lib/Firebase/firebase_init";
+import { firestore } from "$lib/firebase/firebase_init";
 import { validateITN } from "$lib/payfast/validate_itn";
 import { error } from "@sveltejs/kit";
 import { addDoc, Timestamp } from "firebase/firestore";
@@ -6,14 +6,13 @@ import { collection } from "firebase/firestore";
 
 async function addPaymentToFirestore(data: Record<string, string>) {
   try {
-
     const userID = data.custom_str1;
     const token = data.token;
 
     const amount = {
-        amount_gross: data.amount_gross,
-        amount_net: data.amount_net,
-    }
+      amount_gross: data.amount_gross,
+      amount_net: data.amount_net,
+    };
 
     const collectionRef = collection(
       firestore,
@@ -30,7 +29,7 @@ async function addPaymentToFirestore(data: Record<string, string>) {
       timestamp: Timestamp.now(),
     });
   } catch (e) {
-    console.log(e);
+    throw new Error("Failed to add payment information to Firestore.");
   }
 }
 
@@ -50,7 +49,7 @@ export async function POST({ request }) {
     //Function throws if there is an error.
     await validateITN(data, request.headers);
 
-    addPaymentToFirestore(data);
+    await addPaymentToFirestore(data);
 
     return new Response("Valid ITN Recieved.", { status: 200 });
   } catch (e) {

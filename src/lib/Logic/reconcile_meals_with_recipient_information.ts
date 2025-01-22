@@ -1,4 +1,4 @@
-import type { Meal, MealRecipient, MealsWithRecipients } from "$lib/Types/meals";
+import type { Meal, MealRecipient, MealsWithRecipients } from "$lib/types/meals";
 
 
 export const reconcileMealsWithRecipientInformation = (meals: Meal[], recipients: MealRecipient[]) : MealsWithRecipients[] => {

@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Check, CircleX, Clock } from "lucide-svelte";
   import ModalPopupMobile from "../../Utilities/modal_popup_mobile.svelte";
-  import type { MealRecipient } from "$lib/Types/meals";
+  import type { MealRecipient } from "$lib/types/meals";
   import { getContext } from "svelte";
-  import type { Order } from "$lib/Types/orders";
+  import type { Order } from "$lib/types/orders";
   import { clampString } from "$lib/Logic/clamp_string";
 
   // Import ShadCN/Svelte Badge component

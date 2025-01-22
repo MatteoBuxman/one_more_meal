@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Order } from "$lib/Types/orders";
+  import type { Order } from "$lib/types/orders";
   import Donation from "./donation.svelte";
 
   type MealManagerProps = {

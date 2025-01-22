@@ -9,7 +9,7 @@ import {
 import type {
   FirebaseAuthObject,
   FirebaseContext,
-} from "$lib/Types/firebase_information";
+} from "$lib/types/firebase_information";
 import {
   getFirestore,
   connectFirestoreEmulator,

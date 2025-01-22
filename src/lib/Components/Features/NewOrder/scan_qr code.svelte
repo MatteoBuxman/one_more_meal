@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Point, SuccessfulQRCodeScanCallback } from "$lib/Types/qr_code";
+  import type { Point, SuccessfulQRCodeScanCallback } from "$lib/types/qr_code";
   import jsQR from "jsqr";
   import { onMount, onDestroy } from "svelte";
   import { Camera, X } from "lucide-svelte";

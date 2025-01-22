@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { useAuthStore } from "$lib/Firebase/firebase_init";
-  import { loginWithEmail, logOut } from "../../Firebase/Auth/login_logout";
+  import { useAuthStore } from "$lib/firebase/firebase_init";
+  import { loginWithEmail, logOut } from "../../firebase/auth/login_logout";
   import { Menu } from "lucide-svelte";
   //Listener to close the menu when clicked outside
   $effect(() => {

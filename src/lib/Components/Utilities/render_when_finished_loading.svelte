@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { useAuthStore } from "$lib/Firebase/firebase_init";
+    import { useAuthStore } from "$lib/firebase/firebase_init";
     import { LoaderPinwheel } from "lucide-svelte";
     import type { Snippet } from "svelte";
   

@@ -1,9 +1,9 @@
 <script lang="ts">
 
 	import * as Sidebar from "$lib/components/ui/sidebar/index";
-  	import { useAuthStore } from "$lib/Firebase/firebase_init";
+  	import { useAuthStore } from "$lib/firebase/firebase_init";
 	import type { ComponentProps } from "svelte";
-	import { signedOutItems, signedInItems } from "$lib/Types/sidebar_menu_items";
+	import { signedOutItems, signedInItems } from "$lib/types/sidebar_menu_items";
 
 	let { ref = $bindable(null), ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
 	const auth = useAuthStore();

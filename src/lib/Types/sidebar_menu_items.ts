@@ -17,7 +17,7 @@ const baseItems ={
             items: [
                 {
                     title: "Store",
-                    url: "#",
+                    url: "/store",
                 },
                 
             ],
@@ -28,15 +28,15 @@ const baseItems ={
             items: [
                 {
                     title: "About",
-                    url: "#",
+                    url: "/about",
                 },
                 {
                     title: "Legal",
-                    url: "#",
+                    url: "/legal",
                 },
                 {
                     title: "Cookie Policy",
-                    url: "#",
+                    url: "/cookies",
                 },
             ],
         },
@@ -46,7 +46,7 @@ const baseItems ={
             items: [
                 {
                     title: "Contact Us",
-                    url: "#",
+                    url: "/contact",
                 },
             ],
         },

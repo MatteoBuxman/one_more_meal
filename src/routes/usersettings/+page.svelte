@@ -9,10 +9,12 @@
   } from "$lib/components/ui/card";
   import { Button } from "$lib/components/ui/button";
   import { LogOut } from "lucide-svelte";
-  import { useAuthStore } from "$lib/Firebase/firebase_init";
+  import { useAuthStore } from "$lib/firebase/firebase_init";
   import Settings from "$lib/components/Features/Usersettings/settings.svelte";
 
+
   const auth = useAuthStore();
+
 </script>
 
 <div class="p-3">

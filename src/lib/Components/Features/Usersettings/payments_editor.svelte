@@ -3,19 +3,37 @@
   import { CardContent } from "$lib/components/ui/card";
   import { Button } from "$lib/components/ui/button";
   import { Plus, CreditCard, Trash } from "lucide-svelte";
-  import { firestore, useAuthStore } from "$lib/Firebase/firebase_init";
+  import { firestore, useAuthStore } from "$lib/firebase/firebase_init";
   import Separator from "$lib/components/ui/separator/separator.svelte";
   import LoadingBar from "$lib/components/Utilities/loading_bar.svelte";
-  import type { AddedPaymentCard, Bill } from "$lib/Types/payments";
-  import { collection, doc, getDocs } from "firebase/firestore";
+  import type { AddedPaymentCard, Bill } from "$lib/types/payments";
+  import {
+    collection,
+    doc,
+    getDocs,
+    updateDoc,
+    writeBatch,
+  } from "firebase/firestore";
   import { get } from "svelte/store";
   import { formatDate } from "$lib/Logic/format_date";
+  import Input from "$lib/components/ui/input/input.svelte";
+  import * as RadioGroup from "$lib/components/ui/radio-group/index";
+  import debounce from "debounce";
+  import { onMount } from "svelte";
 
-  let showBillingHistory = false;
+  let showBillingHistory = $state(false);
 
   const auth = useAuthStore();
 
-  async function fetchCards(): Promise<AddedPaymentCard[]> {
+  let cards: AddedPaymentCard[] | null = $state(null);
+
+  onMount(() => {
+    fetchCards();
+  });
+
+  
+
+  async function fetchCards() {
     const collectionRef = collection(
       firestore,
       "Users",
@@ -25,16 +43,17 @@
 
     const snapshot = await getDocs(collectionRef);
 
-    return snapshot.docs.map((doc) => {
-      return {
-        tokenID: doc.id,
-        ...doc.data(),
-      } as AddedPaymentCard;
-    });
+    cards = snapshot.docs
+      .map((doc) => {
+        return {
+          tokenID: doc.id,
+          ...doc.data(),
+        } as AddedPaymentCard;
+      })
+      .sort((a, b) => b.added.toMillis() - a.added.toMillis());
   }
 
   async function viewPaymentHistory(): Promise<Bill[]> {
-    const cards = await fetchCards();
 
     let payments: Bill[] = [];
 
@@ -45,7 +64,7 @@
       "added_cards"
     );
 
-    for (const card of cards) {
+    for (const card of (cards as AddedPaymentCard[])) {
       const ref = collection(collectionRef, card.tokenID, "charges");
 
       // Await the async operation
@@ -58,6 +77,62 @@
 
     return payments;
   }
+
+  function makeNameChangeHandler(tokenID: string) {
+    function handleNameChange(e: Event) {
+      const target = e.target as HTMLInputElement;
+
+      const docRef = doc(
+        firestore,
+        "Users",
+        get(auth).user?.uid || "",
+        "added_cards",
+        tokenID
+      );
+
+      updateDoc(docRef, {
+        cardName: target.value,
+      }).then(() => {
+        console.log("Name changed to: ", target.value);
+      });
+    }
+
+    return debounce(handleNameChange, 2500);
+  }
+
+  function changeDefaultCard(tokenID: string) {
+    const collectionRef = collection(
+      firestore,
+      "Users",
+      get(auth).user?.uid || "",
+      "added_cards"
+    );
+    const adjustment = writeBatch(firestore);
+    
+    //Unset old default
+    const oldDefaultID = cards?.find((card) => card.default === true)?.tokenID;
+    const oldDefault = doc(collectionRef, oldDefaultID);
+    adjustment.update(oldDefault, {
+      default: false,
+    });
+    
+    //Set new default
+    const newDefault = doc(collectionRef, tokenID);
+    adjustment.update(newDefault, {
+      default: true,
+    });
+
+    adjustment.commit();
+
+    //Update the cards array to reflect the new default card
+    cards = (cards as AddedPaymentCard[]).map((card) => {
+      if (card.tokenID === tokenID) {
+        return { ...card, default: true };
+      } else {
+        return { ...card, default: false };
+      }
+    });
+  }
 </script>
 
 <!-- Billing Settings -->
@@ -66,34 +141,74 @@
     <div class="space-y-4">
       <div class="space-y-4">
         <h4 class="font-medium">Payment Methods</h4>
-        {#if $auth.user}
-          {#await fetchCards()}
+        <p class="text-sm text-gray-500">
+          Please click on a card to select it as your preferred payment method.
+          You can change the name of a card by clicking on its name.
+        </p>
+        {#if !$auth.user || !cards}
             <LoadingBar />
-          {:then cards}
-            {#each cards as card}
-              <div
-                class="flex items-center justify-between p-4 border rounded-lg"
-              >
-                <div class="flex items-center gap-4">
-                  <CreditCard class="h-6 w-6" />
-                  <div>
-                    <p class="font-medium">{card.cardName}</p>
-                    <p class="text-sm text-muted-foreground">
-                      {formatDate(card.added.toMillis())}
-                    </p>
+          {:else}
+            <RadioGroup.Root
+              onValueChange={changeDefaultCard}
+              value={cards.find((card) => card.default)?.tokenID}
+            >
+              {#each cards as card, i (card.tokenID)}
+                <div
+                  class="flex items-center justify-between p-4 border rounded-lg {card.default ? 'border border-solid border-gray-400 rounded' : ''}"
+                >
+                  <RadioGroup.Item value={card.tokenID} id={`r${i}`} />
+                  <div class="flex items-center gap-4 ">
+                    <CreditCard class="h-6 w-6" />
+                    <div>
+                      <Input
+                        value={card.cardName}
+                        class="text-sm p-1 h-[1rem] rounded-none mb-2"
+                        oninput={makeNameChangeHandler(card.tokenID)}
+                      />
+                      <p class="text-sm text-muted-foreground">
+                        {formatDate(card.added.toMillis())}
+                      </p>
+                    </div>
                   </div>
+                  <Button variant="outline" size="sm"><Trash /></Button>
                 </div>
-                <Button variant="outline" size="sm"><Trash /></Button>
-              </div>
-            {/each}
-          {:catch error}
-            <p class="text-red-500">{error.message}</p>
-          {/await}
+              {/each}
+            </RadioGroup.Root>
         {/if}
-        <Button variant="outline" class="w-full">
-          <Plus class="h-4 w-4 mr-2" />
-          Add Payment Method
-        </Button>
+        <form action="https://sandbox.payfast.co.za​/eng/process" method="post">
+          <input type="hidden" name="merchant_id" value="10032305" />
+          <input type="hidden" name="merchant_key" value="pgk27qkk86ibo" />
+          <input
+            type="hidden"
+            name="return_url"
+            value="https://867b-102-132-162-197.ngrok-free.app/usersettings"
+          />
+          <input
+            type="hidden"
+            name="cancel_url"
+            value="https://867b-102-132-162-197.ngrok-free.app/usersettings"
+          />
+          <input
+            type="hidden"
+            name="notify_url"
+            value="https://867b-102-132-162-197.ngrok-free.app/api/registertoken"
+          />
+          <input type="hidden" name="amount" value="0" />
+          <input type="hidden" name="item_name" value="Add New Card" />
+          <input type="hidden" name="custom_str1" value={$auth.user?.uid} />
+          <input type="hidden" name="custom_str2" value="New Card" />
+          <input type="hidden" name="subscription_type" value="2" />
+          <input
+            type="hidden"
+            name="signature"
+            value="dd39116e4be7da34612233d32bc00b44"
+          />
+
+          <Button variant="outline" type="submit" class="w-full">
+            <Plus class="h-4 w-4 mr-2" />
+            Add Payment Method
+          </Button>
+        </form>
       </div>
 
       <Separator />

@@ -1,14 +1,16 @@
 import crypto from "node:crypto";
 import { PASSPHRASE } from "$env/static/private";
+import { PayfastRequestError } from "$lib/errors/payfast/payfast_errors";
 
 type ChargeRequestParams = {
   token: string;
   amount: number;
   headers: Record<string, string>;
-  body: Record<string, string>;
+  body: Record<string, string | string>;
 };
 
 export async function chargeToken(params: ChargeRequestParams): Promise<void> {
+
   const dateNow = new Date().toISOString().slice(0, 19);
 
   let data: Record<string, string> = {
@@ -40,8 +42,6 @@ export async function chargeToken(params: ChargeRequestParams): Promise<void> {
 
   const requestBody = new URLSearchParams(params.body);
 
-  
-
     const response = await fetch(`https://api.payfast.co.za/subscriptions/${params.token}/adhoc?testing=true`, {
         method: "POST",
         headers: requestHeaders,
@@ -50,7 +50,11 @@ export async function chargeToken(params: ChargeRequestParams): Promise<void> {
 
     
 
-    if (response.status !== 200) {
-        throw new Error("Failed to charge card.");
+    //Check the response status
+    if (!response.ok) {
+        throw new PayfastRequestError(
+            `Error querying the PayFast API: ${response.statusText}`,
+            response.status
+        );
     }
 }

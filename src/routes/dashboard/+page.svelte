@@ -4,8 +4,8 @@
   import type { PageData } from "./$types";
   import LoadingBar from "$lib/components/Utilities/loading_bar.svelte";
   import ErrorModal from "$lib/components/Errors/error_modal.svelte";
-  import { firestore, useAuthStore } from "$lib/Firebase/firebase_init";
-  import { fetchUserCompletedOrders, fetchUserOpenOrders } from "$lib/Firebase/Firestore/fetch_data";
+  import { firestore, useAuthStore } from "$lib/firebase/firebase_init";
+  import { fetchUserCompletedOrders, fetchUserOpenOrders } from "$lib/firebase/firestore/fetch_data";
 
   let { data }: { data: PageData } = $props();
 

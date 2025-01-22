@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { fetchMealRecipientInfo } from "$lib/Firebase/Firestore/fetch_data";
+  import { fetchMealRecipientInfo } from "$lib/firebase/firestore/fetch_data";
   import { formatDate } from "$lib/Logic/format_date";
-  import type { Order } from "$lib/Types/orders";
+  import type { Order } from "$lib/types/orders";
   import ViewMealRecipient from "./view_meal_recipient.svelte";
   import LoadingBar from "../../Utilities/loading_bar.svelte";
   import { slide } from "svelte/transition";
-  import { useFirestore } from "$lib/Firebase/firebase_init";
-  import type { Meal, MealsWithRecipients } from "$lib/Types/meals";
+  import { useFirestore } from "$lib/firebase/firebase_init";
+  import type { Meal, MealsWithRecipients } from "$lib/types/meals";
   import OrderStateBadge from "./order_state_badge.svelte";
   import { Clock } from "lucide-svelte";
   import ErrorBadge from "$lib/components/Errors/error_badge.svelte";

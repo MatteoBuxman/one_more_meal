@@ -1,5 +1,6 @@
 import type { Timestamp } from "firebase/firestore";
 import type { Meal } from "./meals";
+import type { UserLocation } from "./location";
 
 export interface Order {
     id: string;
@@ -12,4 +13,5 @@ export interface Order {
 
 export interface OrderWithMeals extends Order{
     meals: Meal[];
+    pickup_location: string; //The id of the added address in our database.
 }

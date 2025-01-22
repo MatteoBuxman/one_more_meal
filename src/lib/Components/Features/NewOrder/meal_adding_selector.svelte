@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
+  import type { OneMoreMealPackagingFlowState } from "$lib/types/meals";
   import AddedMealCard from "./added_meal_card.svelte";
   import { getContext } from "svelte";
 

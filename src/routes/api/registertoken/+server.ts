@@ -1,4 +1,4 @@
-import { firestore } from "$lib/Firebase/firebase_init.js";
+import { firestore } from "$lib/firebase/firebase_init.js";
 import { validateITN } from "$lib/payfast/validate_itn.js";
 import { error } from "@sveltejs/kit";
 import { doc, setDoc, Timestamp } from "firebase/firestore";

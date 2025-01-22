@@ -1,11 +1,11 @@
-import type { UserAddress } from "$lib/Types/user_settings";
+import type { UserLocation } from "$lib/types/location"; 
 
 //Idea is that whichever location is the first element in the array will be the one that is currently selected.
 export class LocationDropdownSelectorState {
 
-  private _locations = $state<UserAddress[]>([]);
+  private _locations = $state<UserLocation[]>([]);
 
-  constructor(locations: UserAddress[], onStateChange?: () => void) {
+  constructor(locations: UserLocation[], onStateChange?: () => void) {
     this._locations = locations;
   }
 
@@ -20,16 +20,16 @@ export class LocationDropdownSelectorState {
     
   }
 
-  public getSelectedLocation(): UserAddress {
+  public getSelectedLocation(): UserLocation {
     return this._locations[0];
   }
 
-  public getLocations(): UserAddress[] {
+  public getLocations(): UserLocation[] {
     const remainder = this._locations.slice(1);
     return remainder;
   }
 }
 
-export function useLocationDropdownSelectorState(locations: UserAddress[]) {
+export function useLocationDropdownSelectorState(locations: UserLocation[]) {
   return new LocationDropdownSelectorState(locations);
 }

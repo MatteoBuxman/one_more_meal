@@ -1,8 +1,8 @@
 <script lang="ts">
-  import MenuPopup from "$lib/components/Utilities/menu_popup.svelte";
+
   import OneMoreMealPackagingFlow from "$lib/components/Features/NewOrder/one_more_meal_packaging_flow.svelte";
   import ContextProvider from "$lib/components/Utilities/context_provider.svelte";
-  import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
+  import type { OneMoreMealPackagingFlowState } from "$lib/types/meals";
   import { QrCode, AlertCircle } from "lucide-svelte";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
@@ -13,12 +13,6 @@
   import { page } from "$app/stores";
   import Button from "$lib/components/ui/button/button.svelte";
   import Card from "$lib/components/ui/card/card.svelte";
-
-  const menu_configuration = [
-    { name: "Dashboard", link: "/dashboard" },
-    { name: "About", link: "/about" },
-    { name: "Contact", link: "/contact" },
-  ];
 
   let loading = $state(true);
 

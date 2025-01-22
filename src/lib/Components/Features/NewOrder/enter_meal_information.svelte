@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Meal, OneMoreMealPackagingFlowState } from "$lib/Types/meals";
+  import type { Meal, OneMoreMealPackagingFlowState } from "$lib/types/meals";
   import { getContext } from "svelte";
   import ScanAdditionalMeals from "./scan_additional_meals.svelte";
   import Badge from "$lib/components/ui/badge/badge.svelte";

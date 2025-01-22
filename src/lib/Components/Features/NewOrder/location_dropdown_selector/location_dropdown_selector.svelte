@@ -1,13 +1,11 @@
 <script lang="ts">
   import Card from "$lib/components/ui/card/card.svelte";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index";
-  import type { UserAddress } from "$lib/Types/user_settings";
   import { ChevronDown, MapPin } from "lucide-svelte";
-  import { useLocationDropdownSelectorState } from "./location_dropdown_selector_state.svelte";
+  import { LocationDropdownSelectorState } from "./location_dropdown_selector_state.svelte";
 
-  let { addresses }: { addresses: UserAddress[] } = $props();
+  let { state }: { state: LocationDropdownSelectorState } = $props();
 
-  const state = useLocationDropdownSelectorState(addresses);
 </script>
 
 <DropdownMenu.Root>
@@ -29,7 +27,7 @@
                 ", " +
                 state.getSelectedLocation().province +
                 ", " +
-                state.getSelectedLocation().postalCode}
+                state.getSelectedLocation().postal_code}
             </h3>
           </div>
         </div>
@@ -41,7 +39,7 @@
     <DropdownMenu.Group>
       <DropdownMenu.GroupHeading>Saved Locations</DropdownMenu.GroupHeading>
       <DropdownMenu.Separator />
-      {#each state.getLocations() as address, i (address.addressId)}
+      {#each state.getLocations() as address, i (address.address_id)}
         <DropdownMenu.Item onclick={() => state.newSelection(i + 1)}>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -59,7 +57,7 @@
                     ", " +
                     address.province +
                     ", " +
-                    address.postalCode}
+                    address.postal_code}
                 </h3>
               </div>
             </div>

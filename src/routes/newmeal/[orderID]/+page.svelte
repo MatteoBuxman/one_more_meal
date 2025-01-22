@@ -8,20 +8,31 @@
 
   import RandomFoodIcon from "$lib/components/Utilities/random_food_icon.svelte";
   import { page } from "$app/stores";
-  import type { Meal } from "$lib/Types/meals";
+  import type { Meal } from "$lib/types/meals";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
-  import type { OrderWithMeals } from "$lib/Types/orders";
-  import { postOrder } from "$lib/Firebase/Firestore/post_data";
-  import { useAuthStore, useFirestore } from "$lib/Firebase/firebase_init";
+  import type { OrderWithMeals } from "$lib/types/orders";
+  import { postOrder } from "$lib/firebase/firestore/post_data";
+  import { useAuthStore, useFirestore } from "$lib/firebase/firebase_init";
   import ErrorModal from "$lib/components/Errors/error_modal.svelte";
-  import { Timestamp } from "firebase/firestore";
+  import {
+    collection,
+    getDocs,
+    query,
+    Timestamp,
+    where,
+  } from "firebase/firestore";
   import Button from "$lib/components/ui/button/button.svelte";
   import Card from "$lib/components/ui/card/card.svelte";
   import ModalPopupMobile from "$lib/components/Utilities/modal_popup_mobile.svelte";
   import LoadingBar from "$lib/components/Utilities/loading_bar.svelte";
-  import { fetchUserAddresses } from "$lib/Firebase/Firestore/fetch_data";
+  import { fetchUserAddresses } from "$lib/firebase/firestore/fetch_data";
   import LocationDropdownSelector from "$lib/components/Features/NewOrder/location_dropdown_selector/location_dropdown_selector.svelte";
+  import type { AddedPaymentCard } from "$lib/types/payments";
+  import {
+    LocationDropdownSelectorState,
+    useLocationDropdownSelectorState,
+  } from "$lib/components/Features/NewOrder/location_dropdown_selector/location_dropdown_selector_state.svelte";
 
   let addedMeals: Meal[] = $state([]);
   let orderID: string;
@@ -29,7 +40,7 @@
   let submissionError = $state(false);
   let deliveryInfo = $state(false);
   let pickupTime = $state(false);
-  let selectedLocationID = $state("");
+  let currentCard: AddedPaymentCard | null = $state(null);
 
   const firestore = useFirestore();
 
@@ -53,6 +64,9 @@
         addedMeals = inSessionMeals.meals;
       }
     }
+
+    fetchDefaultCard();
+    loadAddresses();
   });
 
   function handleReturn() {
@@ -70,21 +84,71 @@
       created_at: Timestamp.now(),
       updated_at: null,
       completed_at: null,
+      pickup_location: locationState!.getSelectedLocation().address_id,
     };
 
     try {
-      await postOrder(firestore, $auth.user?.uid || '', order);
+
+      const response = await fetch("/api/chargetoken", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: currentCard?.tokenID,
+          amount: 5000,
+          item_name: "meal_pickup",
+          user_id: $auth.user?.uid,
+          order_id: orderID,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Payment failed");
+      }
+
+
+      await postOrder(firestore, $auth.user?.uid || "", order);
 
       sessionStorage.removeItem("mostRecentMeals");
       goto(`/newmeal/${orderID}/confirmed`);
     } catch (e) {
       isSubmitting = false;
       submissionError = true;
+      console.log(e);
     }
   }
 
   const auth = useAuthStore();
-  
+
+  async function fetchDefaultCard() {
+    const collectionRef = collection(
+      firestore,
+      "Users",
+      $auth.user?.uid || "",
+      "added_cards"
+    );
+
+    const q = query(collectionRef, where("default", "==", true));
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return null;
+    }
+
+    currentCard =  {...snapshot.docs[0].data(), tokenID: snapshot.docs[0].id} as AddedPaymentCard;
+  }
+
+  let locationState: LocationDropdownSelectorState | null = $state(null);
+
+  async function loadAddresses() {
+    const addresses = await fetchUserAddresses(
+      firestore,
+      $auth.user?.uid ?? ""
+    );
+    locationState = useLocationDropdownSelectorState(addresses);
+  }
 </script>
 
 <ErrorModal
@@ -130,19 +194,14 @@
 
   <!-- Store Info Card -->
 
-  
-
-   {#if $auth.user}
   <div class="mx-4 mt-6 bg-white rounded-b shadow-lg border border-gray-100">
     <h1 class="text-black font-bold p-3 text-sm">Pickup location</h1>
-    {#await fetchUserAddresses(firestore, $auth.user.uid)}
+    {#if !locationState}
       <LoadingBar />
-    {:then addresses}
-      <LocationDropdownSelector {addresses} />
-    {/await}
-  
+    {:else}
+      <LocationDropdownSelector state={locationState} />
+    {/if}
   </div>
-  {/if}
 
   <!-- Pickup Time Section -->
   <div class="px-3 mt-6">
@@ -176,8 +235,7 @@
         <div class="text-left">
           <p class="font-medium">Delivery Costs</p>
           <p class="text-sm text-gray-600">
-            All you cover are delivery costs and a service fee. We charge a rate
-            proportional to your distance from our distribution center.
+            All you cover are delivery costs and a service fee. We charge a flat rate.
           </p>
         </div>
       </div>
@@ -219,8 +277,8 @@
       class="bg-white rounded shadow-sm border border-gray-100 p-4 space-y-3"
     >
       <div class="flex justify-between items-center">
-        <span class="text-gray-600">Subtotal</span>
-        <span>R 38.50</span>
+        <span class="text-gray-600">Pickup Fee</span>
+        <span>R 40.00</span>
       </div>
       <div class="flex justify-between items-center">
         <span class="text-gray-600">Service fee</span>
@@ -228,7 +286,7 @@
       </div>
       <div class="flex justify-between items-center pt-2 border-t font-bold">
         <span>Total</span>
-        <span>R 48.50</span>
+        <span>R 50.00</span>
       </div>
     </div>
 
@@ -246,12 +304,21 @@
       {/if}
     </Button>
 
-    <div
-      class="flex items-center justify-center gap-2 mt-4 mb-8 text-sm text-gray-500"
-    >
-      <CreditCard />
-      <span>Paying with •••• 2132</span>
-    </div>
+    {#if $auth.user}
+      <div
+        class="flex items-center justify-center gap-2 mt-4 mb-8 text-sm text-gray-500"
+      >
+        <CreditCard />
+        {#if !currentCard}
+          <LoadingBar />
+        {:else}
+          <span>Paying with {currentCard.cardName}</span>
+        {/if}
+      </div>
+    {/if}
+    <p class="text-sm text-gray-500 text-center">
+      Change your selected payment method in account settings.
+    </p>
   </div>
 </div>
 

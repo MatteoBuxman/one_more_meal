@@ -4,12 +4,16 @@
   import "../app.css";
   import LoadingBar from "$lib/components/Utilities/loading_bar.svelte";
   import { navigating } from "$app/stores";
-
   import AppSidebar from "$lib/components/app-sidebar.svelte";
   import * as Sidebar from "$lib/components/ui/sidebar/index";
   import Footer from "$lib/components/Static/footer.svelte";
 
   let { children } = $props();
+
+  const contextValues = {
+    ...firebaseContext,
+  };
+
 </script>
 
 <div class="fixed top-0 w-full">
@@ -17,7 +21,7 @@
     <LoadingBar />
   {/if}
 </div>
-<ContextProvider contextValues={firebaseContext}>
+<ContextProvider {contextValues}>
   <Sidebar.Provider>
     <Sidebar.Inset>
       <header

@@ -18,7 +18,7 @@
   import { MapPin, Plus,  Bell, CreditCard, Shield } from "lucide-svelte";
   
   import LocationEditor from "./location_editor.svelte";
-  import { useAuthStore } from "$lib/Firebase/firebase_init";
+  import { useAuthStore } from "$lib/firebase/firebase_init";
   import PaymentsEditor from "./payments_editor.svelte";
   import NotificationsEditor from "./notifications_editor.svelte";
   import SecurityEditor from "./security_editor.svelte";

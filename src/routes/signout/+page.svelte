@@ -2,8 +2,8 @@
   import * as Card from "$lib/components/ui/card";
   import * as Button from "$lib/components/ui/button";
   import { signOut } from "firebase/auth";
-  import { useAuthStore } from "$lib/Firebase/firebase_init";
-  import { auth } from "$lib/Firebase/firebase_init";
+  import { useAuthStore } from "$lib/firebase/firebase_init";
+  import { auth } from "$lib/firebase/firebase_init";
 
   let isOpen = false; // State for controlling card visibility
 

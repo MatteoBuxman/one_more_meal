@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Meal, OneMoreMealPackagingFlowState } from "$lib/Types/meals";
+  import type { Meal, OneMoreMealPackagingFlowState } from "$lib/types/meals";
   import { getContext } from "svelte";
   import ModalPopupMobile from "../../Utilities/modal_popup_mobile.svelte";
   import { clampString } from "$lib/Logic/clamp_string";

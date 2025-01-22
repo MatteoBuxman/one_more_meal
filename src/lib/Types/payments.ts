@@ -4,6 +4,7 @@ export interface AddedPaymentCard{
     cardName: string;
     tokenID: string;
     added: Timestamp;
+    default: boolean;
 }
 
 export interface Bill{

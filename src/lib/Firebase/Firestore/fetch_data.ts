@@ -3,8 +3,8 @@ import type {
   Meal,
   MealRecipient,
   MealsWithRecipients,
-} from "$lib/Types/meals";
-import type { Order } from "$lib/Types/orders";
+} from "$lib/types/meals";
+import type { Order } from "$lib/types/orders";
 import {
   collection,
   Firestore,
@@ -15,7 +15,7 @@ import {
 //Production or Development mode
 import { PUBLIC_PRODUCTION } from "$lib/Logic/production_state";
 import { FirebaseError } from "firebase/app";
-import type { UserAddress } from "$lib/Types/user_settings";
+import type { UserLocation } from "$lib/types/location";
 
 const parseSnapshotDataAsOrder = (snapshot: QuerySnapshot): Order[] => {
   const orders = snapshot.docs.map((doc) => {
@@ -84,6 +84,9 @@ export const fetchUserOpenOrders = async (
     const docPath = collection(firestore, `Orders/${userUUID}/openOrders`);
     const snapshot = await getDocs(docPath);
     const orders = parseSnapshotDataAsOrder(snapshot);
+    orders.sort((a, b) => (b.created_at as number) - (a.created_at as number));
+
+    console.log("Timestamp of first", orders[0].created_at);
 
     if (!PUBLIC_PRODUCTION) {
       await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -118,6 +121,7 @@ export const fetchUserCompletedOrders = async (
     const docPath = collection(firestore, `Orders/${userUUID}/completedOrders`);
     const snapshot = await getDocs(docPath);
     const orders = parseSnapshotDataAsOrder(snapshot);
+    orders.sort((a, b) => (b.created_at as number) - (a.created_at as number));
 
     if (!PUBLIC_PRODUCTION) {
       await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -218,7 +222,7 @@ export const fetchMealRecipientInfo = async (
 };
 
 
-export const fetchUserAddresses =  async (firestore: Firestore, userUUID: string) : Promise<UserAddress[]> => {
+export const fetchUserAddresses =  async (firestore: Firestore, userUUID: string) : Promise<UserLocation[]> => {
   try {
 
     if (!userUUID) {
@@ -229,16 +233,18 @@ export const fetchUserAddresses =  async (firestore: Firestore, userUUID: string
     const snapshot = await getDocs(docPath);
     let addresses = snapshot.docs.map((doc) => {
       const addressData = doc.data();
-      const address: UserAddress = {
-        addressId: doc.id,
+      const address: UserLocation = {
+        address_id: doc.id,
         name: addressData.name,
-        phoneNumber: addressData.phoneNumber,
+        phone_number: addressData.phone_number,
         isDefault: addressData.isDefault,
         city: addressData.city,
-        postalCode: addressData.postalCode,
+        postal_code: addressData.postal_code,
         province: addressData.province,
         street: addressData.street,
         suburb: addressData.suburb,
+        full_address: addressData.full_address,
+        mapbox_id: addressData.mapbox_id,
       };
       return address;
     });
@@ -249,14 +255,14 @@ export const fetchUserAddresses =  async (firestore: Firestore, userUUID: string
 
     
     //Place defaultAddress first.
+    const defaultAddress = addresses.findIndex((address) => address.isDefault);
+
     if (addresses.length > 1) {
-      const defaultAddress = addresses.findIndex((address) => address.isDefault);
       
       const temp = addresses[0];
       addresses[0] = addresses[defaultAddress];
       addresses[defaultAddress] = temp;
     }
-
 
     return addresses;
   } catch (error) {

@@ -2,7 +2,7 @@
   import ScanQrcode from "./scan_qr code.svelte";
   import EnterMealInformation from "./enter_meal_information.svelte";
   import { getContext, onMount } from "svelte";
-  import type { OneMoreMealPackagingFlowState } from "$lib/Types/meals";
+  import type { OneMoreMealPackagingFlowState } from "$lib/types/meals";
   import ModalPopupMobile from "../../Utilities/modal_popup_mobile.svelte";
   import { page } from "$app/stores";
 

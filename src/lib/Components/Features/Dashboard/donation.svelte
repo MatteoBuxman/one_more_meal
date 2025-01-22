@@ -1,7 +1,7 @@
 <script lang="ts">
   import ModalPopupMobile from "$lib/components/Utilities/modal_popup_mobile.svelte";
   import { formatDate } from "$lib/Logic/format_date";
-  import type { Order } from "$lib/Types/orders";
+  import type { Order } from "$lib/types/orders";
   import {
     Clock,
     ChevronDown,
@@ -10,12 +10,12 @@
   } from "lucide-svelte";
   import DonationFurtherInformation from "./donation_further_information.svelte";
   import LoadingBar from "../../Utilities/loading_bar.svelte";
-  import { useFirestore } from "$lib/Firebase/firebase_init";
+  import { useFirestore } from "$lib/firebase/firebase_init";
   import {
     fetchMealRecipientInfo,
     fetchOrderMeals,
-  } from "$lib/Firebase/Firestore/fetch_data";
-  import type { Meal, MealsWithRecipients } from "$lib/Types/meals";
+  } from "$lib/firebase/firestore/fetch_data";
+  import type { Meal, MealsWithRecipients } from "$lib/types/meals";
   import { clampString } from "$lib/Logic/clamp_string";
   import { slide } from "svelte/transition";
   import OrderStateBadge from "./order_state_badge.svelte";
