@@ -12,7 +12,7 @@ export const postOrder = async (firestore: Firestore, userUUID:string,  order: O
 
         const orderDoc = {
             created_at: order.created_at,
-            orderSize: order.orderSize,
+            orderSize: order.order_size,
             status: order.status,
             updated_at: order.updated_at,
             completed_at: order.completed_at,

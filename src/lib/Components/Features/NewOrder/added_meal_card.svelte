@@ -3,7 +3,6 @@
   import { ChevronRight } from "lucide-svelte";
   import RandomFoodIcon from "../../Utilities/random_food_icon.svelte";
   import EditMealInfo from "./edit_meal_info.svelte";
-  import { clampString } from "$lib/Logic/clamp_string";
 
   let { meal_configuration }: { meal_configuration: Meal } = $props();
 

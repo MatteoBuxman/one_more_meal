@@ -2,10 +2,10 @@ import { PayfastRequestError } from "$lib/errors/payfast/payfast_errors.js";
 import {
   IncorrectDataFormatError,
   MissingRequestDataError,
-} from "$lib/errors/payfast/server_errors.js";
+} from "$lib/errors/server/server_errors.js";
 import { firestore } from "$lib/firebase/firebase_init.js";
 import { chargeToken } from "$lib/payfast/charge_token.js";
-import { error } from "@sveltejs/kit";
+import { error, json } from "@sveltejs/kit";
 import { FirebaseError } from "firebase/app";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 
@@ -85,10 +85,27 @@ export async function POST({ request }) {
       e instanceof MissingRequestDataError
     ) {
       console.log(e.message);
-      return new Response(e.message, { status: 400 });
+      return json({ error_message: e.message }, { status: e.status_code });
     }else if(e instanceof PayfastRequestError){
       console.log(`${e.message}. Status code: ${e.status_code}`);
-      return new Response(e.message, { status: e.status_code });
+
+      //Post the error as a failed charge under the user's account
+      const data = await request.json() as ChargeRequest;
+      const collectionRef = collection(firestore, "Users", data.user_id, "added_cards", data.token, "failed_charges");
+
+      addDoc(collectionRef, {
+        amount: data.amount,
+        item_name: data.item_name,
+        order_id: data.order_id,
+        timestamp: Timestamp.now(),
+        error: e.message,
+        body: e.body,
+      }).catch((e) => {
+        console.log(`Failed to post failed charge to firestore: ${e.message}`);
+      });
+
+
+      return json({ error_message: e.message }, { status: e.status_code });
     } 
     //This occurs in the rare case that the card is charged successfully but the transaction is not added to the database.
     else if (e instanceof FirebaseError) {
@@ -100,7 +117,7 @@ export async function POST({ request }) {
     }
     else {
       console.log(`An unknown error occured: ${(e as Error).message}`);
-      return error(500, (e as Error).message);
+      return json({ error_message: "An unknown error occured." }, { status: 500 });
     }
   }
 }

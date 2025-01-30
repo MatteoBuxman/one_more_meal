@@ -1,7 +1,9 @@
-import { PUBLIC_PRODUCTION } from "$lib/Logic/production_state";
+import { PUBLIC_PRODUCTION } from "$lib/function_utilities/production_state";
 import { PASSPHRASE } from "$env/static/private";
 import crypto from "node:crypto";
 import dns from "node:dns";
+import { PayfastValidationError } from "$lib/errors/payfast/payfast_errors";
+import { InternalServerError } from "$lib/errors/server/server_errors";
 
 export async function validateITN(
   data: Record<string, string>,
@@ -44,7 +46,7 @@ export async function validateITN(
       .digest("hex");
 
     if (signature !== data["signature"])
-      throw new Error("Invalid Signature");
+      throw new PayfastValidationError("Invalid ITN signature.");
   };
 
   //2. Validate domain
@@ -84,21 +86,20 @@ export async function validateITN(
         validIps = [...validIps, ...ips];
       }
     } catch (err) {
-      throw new Error("IPLookup Failed.");
+      throw new InternalServerError("IP lookup using node:dns failed.", "{'error_message' : 'IP lookup using node:dns failed'" , {cause: err});
     }
 
     const uniqueIps = [...new Set(validIps)];
 
-    if (uniqueIps.includes(pfIp)) {
-      return true;
+    if (!uniqueIps.includes(pfIp)) {
+      throw new PayfastValidationError("The origin IP of the ITN was not found in the list of valid IPs.");
     }
-    return false;
   };
 
   //3. For safety, check the charge amount is not above MAX_CHARGE_AMOUNT
   const pfValidPaymentData = () => {
     if (parseFloat(data["amount_gross"]) > MAX_CHARGE_AMOUNT)
-      throw new Error("Amount is above maximum allowed charge.");
+      throw new PayfastValidationError("Charge amount should be 0 when registering a new card.");
   };
 
   //4. Query payfast servers to make sure that the recieved data exists on their server
@@ -120,7 +121,7 @@ export async function validateITN(
   }
 
   const pfValidServerConfirmation = async () => {
-    try {
+    
       const resultF = await fetch(`https://${pfHost}/eng/query/validate`, {
         method: "POST",
         headers: {
@@ -131,10 +132,8 @@ export async function validateITN(
 
       const result = await streamToString(resultF.body as ReadableStream);
 
-      if (result !== "VALID") throw new Error();
-    } catch (e) {
-      throw new Error("Error validating ITN with Payfast");
-    }
+      if (result !== "VALID") throw new PayfastValidationError("PayFast could not corroborate the ITN information.");
+    
   };
 
   pfValidSignature();

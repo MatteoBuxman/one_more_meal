@@ -1,26 +1,21 @@
 <script lang="ts">
-  import { X } from "lucide-svelte";
+  import * as Sheet from "$lib/components/ui/sheet/index";
 
-  let modal: HTMLDialogElement;
-  let { error_message, isOpen = $bindable(true) }: { error_message: string, isOpen?: boolean } = $props();
-
-  $effect(()=>{
-    if(isOpen){
-        modal.showModal();
-    }
-  })
+  let {
+    error_message,
+    isOpen = $bindable(true),
+  }: { error_message: string; isOpen?: boolean } = $props();
 </script>
 
-<dialog id="modal_id" class="modal" bind:this={modal} onclose={() => isOpen = false}>
-    <div class="modal-box border shadow-lg shadow-red-300 flex flex-col gap-3 p-4">
-        <form method="dialog" class="ml-auto">
-            <button><X/></button>
-        </form>
-        <h1 class="font-bold">There was an error completing your request.</h1>
-        <p class="text-gray-500 text-sm">{error_message}.</p>
-        <p class="text-gray-500 text-sm">Please check your internet connection or retry in a while.</p>
-    </div>
-    <form class="modal-backdrop" method="dialog">
-        <button>exit</button>
-    </form>
-</dialog>
+<Sheet.Root bind:open={isOpen}>
+  <Sheet.Content side="top" class="shadow-lg shadow-red-500">
+    <Sheet.Header>
+      <Sheet.Title class="text-sm text-left"
+        >We encountered an error.</Sheet.Title
+      >
+    </Sheet.Header>
+    <Sheet.Description class="mt-4">
+      {error_message}
+    </Sheet.Description>
+  </Sheet.Content>
+</Sheet.Root>

@@ -1,23 +1,26 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
+  import type { CurrentOrderState } from "$lib/components/Features/NewOrder/current_order_provider/current_order_state.svelte";
+  import Badge from "$lib/components/ui/badge/badge.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import CardContent from "$lib/components/ui/card/card-content.svelte";
   import Card from "$lib/components/ui/card/card.svelte";
   import ScrollArea from "$lib/components/ui/scroll-area/scroll-area.svelte";
+  import { clampString } from "$lib/function_utilities/clamp_string";
+  import { formatDate } from "$lib/function_utilities/format_date";
   import { Check } from "lucide-svelte";
+  import { getContext, onMount } from "svelte";
 
-  // Sample order data - in a real app this would come from props or stores
-  const order = {
-    orderNumber: "34789",
-    date: "January 18, 2025",
-    pickupFee: 5.99,
-    meals: [
-      { name: "Grilled Chicken Salad", quantity: 2 },
-      { name: "Margherita Pizza", quantity: 1 },
-      { name: "Vegetable Stir Fry", quantity: 1 },
-      { name: "Fresh Fruit Smoothie", quantity: 2 },
-    ],
-  };
+  const order_state = getContext<CurrentOrderState>("current_order_state");
+
+    onMount(()=>{
+      if(!order_state.order.is_complete){
+        goto(`/newmeal/${order_state.order.id}`);
+      }
+    })
+
 </script>
+
 
 <div class="min-h-screen bg-gray-50 flex  justify-center p-3">
   <Card class="max-w-md w-full">
@@ -39,14 +42,14 @@
       </p>
 
       <div class="space-y-4">
-        <div class="border-t border-gray-200 py-4">
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Request number</span>
-            <span class="font-medium text-gray-900">#{order.orderNumber}</span>
+        <div class="border-t border-gray-200 p-4 space-y-4">
+          <div class="flex flex-col gap-2 items-start text-sm">
+            <span class="text-gray-500">Order Number</span>
+            <Badge variant="outline">#{clampString(order_state.order.id, 160)}</Badge>
           </div>
-          <div class="flex justify-between text-sm mt-2">
+          <div class="flex flex-col items-start text-sm mt-2">
             <span class="text-gray-500">Date</span>
-            <span class="font-medium text-gray-900">{order.date}</span>
+            <span class="font-medium text-gray-900">{formatDate(order_state.order.placed_at ?? 0)}</span>
           </div>
         </div>
 
@@ -56,7 +59,7 @@
           </h2>
           <ScrollArea class="h-48">
             <div class="space-y-3">
-              {#each order.meals as meal, index (index)}
+              {#each order_state.order.meals as meal, index (index)}
                 <div class="flex text-sm">
                   <div class="flex-1 text-left">
                     <span class="font-medium text-gray-900">
@@ -71,7 +74,7 @@
           <div class="mt-4 pt-4 border-t border-gray-200">
             <div class="flex justify-between text-sm">
               <span>Pickup fee</span>
-              <span class="font-medium">${order.pickupFee.toFixed(2)}</span>
+              <span class="font-medium">R{50}</span>
             </div>
           </div>
         </div>

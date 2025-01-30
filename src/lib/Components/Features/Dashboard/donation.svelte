@@ -1,6 +1,6 @@
 <script lang="ts">
   import ModalPopupMobile from "$lib/components/Utilities/modal_popup_mobile.svelte";
-  import { formatDate } from "$lib/Logic/format_date";
+  import { formatDate } from "$lib/function_utilities/format_date";
   import type { Order } from "$lib/types/orders";
   import {
     Clock,
@@ -16,7 +16,7 @@
     fetchOrderMeals,
   } from "$lib/firebase/firestore/fetch_data";
   import type { Meal, MealsWithRecipients } from "$lib/types/meals";
-  import { clampString } from "$lib/Logic/clamp_string";
+  import { clampString } from "$lib/function_utilities/clamp_string";
   import { slide } from "svelte/transition";
   import OrderStateBadge from "./order_state_badge.svelte";
   import ErrorBadge from "$lib/components/Errors/error_badge.svelte";
@@ -80,7 +80,7 @@
     </Card.Content>
     <Card.Footer>
       <div class="flex justify-between w-full">
-        <span class="text-sm text-gray-500">{order.orderSize} meals</span>
+        <span class="text-sm text-gray-500">{order.order_size} meals</span>
         <p class="text-sm text-gray-500">
           {expandedOrder === order.id ? "Close" : "Click to expand"}
         </p>
@@ -252,7 +252,7 @@
   {#snippet footer()}
     <div class="flex flex-col gap-4 mt-4">
       <div class="text-sm text-gray-600">
-        Total Items: {order.orderSize}
+        Total Items: {order.order_size}
       </div>
 
       {#if order.status === "ordered"}

@@ -7,9 +7,7 @@
   } from "lucide-svelte";
 
   import RandomFoodIcon from "$lib/components/Utilities/random_food_icon.svelte";
-  import { page } from "$app/stores";
-  import type { Meal } from "$lib/types/meals";
-  import { onMount } from "svelte";
+  import { getContext, onMount } from "svelte";
   import { goto } from "$app/navigation";
   import type { OrderWithMeals } from "$lib/types/orders";
   import { postOrder } from "$lib/firebase/firestore/post_data";
@@ -33,9 +31,8 @@
     LocationDropdownSelectorState,
     useLocationDropdownSelectorState,
   } from "$lib/components/Features/NewOrder/location_dropdown_selector/location_dropdown_selector_state.svelte";
+  import { CurrentOrderState } from "$lib/components/Features/NewOrder/current_order_provider/current_order_state.svelte";
 
-  let addedMeals: Meal[] = $state([]);
-  let orderID: string;
   let isSubmitting = $state(false);
   let submissionError = $state(false);
   let deliveryInfo = $state(false);
@@ -43,26 +40,14 @@
   let currentCard: AddedPaymentCard | null = $state(null);
 
   const firestore = useFirestore();
+  const auth = useAuthStore();
+
+  const order_state = getContext<CurrentOrderState>("current_order_state");
+
 
   onMount(() => {
-    orderID = $page.params.orderID;
-
-    const isEmpty = (obj: Object) => Object.keys(obj).length === 0;
-
-    //Check if there are any existing added meals
-    const inSessionMeals = JSON.parse(
-      sessionStorage.getItem("mostRecentMeals") || "{}"
-    );
-
-    if (isEmpty(inSessionMeals)) {
-      goto(`/newmeal`);
-    } else {
-      //Check if the added meals are still valid
-      if (inSessionMeals.expiryTime < Date.now()) {
-        goto(`/newmeal`);
-      } else {
-        addedMeals = inSessionMeals.meals;
-      }
+    if(order_state.order.is_empty){
+      goto("/newmeal");
     }
 
     fetchDefaultCard();
@@ -77,10 +62,10 @@
     isSubmitting = true;
 
     const order: OrderWithMeals = {
-      id: orderID,
-      meals: addedMeals,
+      id: order_state.order.id,
+      meals: order_state.order.meals,
       status: "ordered",
-      orderSize: addedMeals.reduce((acc, meal) => acc + meal.quantity, 0),
+      order_size: order_state.order.order_size,
       created_at: Timestamp.now(),
       updated_at: null,
       completed_at: null,
@@ -99,7 +84,7 @@
           amount: 5000,
           item_name: "meal_pickup",
           user_id: $auth.user?.uid,
-          order_id: orderID,
+          order_id: order_state.order.id,
         }),
       });
 
@@ -110,8 +95,9 @@
 
       await postOrder(firestore, $auth.user?.uid || "", order);
 
-      sessionStorage.removeItem("mostRecentMeals");
-      goto(`/newmeal/${orderID}/confirmed`);
+      order_state.placeOrder();
+
+      goto(`/newmeal/${order_state.order.id}/confirmed` );
     } catch (e) {
       isSubmitting = false;
       submissionError = true;
@@ -119,7 +105,6 @@
     }
   }
 
-  const auth = useAuthStore();
 
   async function fetchDefaultCard() {
     const collectionRef = collection(
@@ -248,10 +233,10 @@
     <div class="bg-white rounded shadow-sm border border-gray-100 p-4">
       <h2 class="text-lg font-bold mb-4">Order Summary</h2>
       <div class="flex flex-col gap-3">
-        {#if addedMeals.length === 0}
+        {#if order_state.order.is_empty}
           <p class="text-gray-500">No meals added</p>
         {/if}
-        {#each addedMeals as meal}
+        {#each order_state.order.meals as meal}
           <div class="flex items-center gap-4 pb-4">
             <div
               class=" bg-gray-100 rounded-full flex items-center justify-center size-12"
@@ -312,7 +297,7 @@
         {#if !currentCard}
           <LoadingBar />
         {:else}
-          <span>Paying with {currentCard.cardName}</span>
+          <span>Paying with {currentCard.card_name}</span>
         {/if}
       </div>
     {/if}

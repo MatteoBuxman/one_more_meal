@@ -54,7 +54,8 @@ export async function chargeToken(params: ChargeRequestParams): Promise<void> {
     if (!response.ok) {
         throw new PayfastRequestError(
             `Error querying the PayFast API: ${response.statusText}`,
-            response.status
+            response.status,
+            await response.json(),
         );
     }
 }

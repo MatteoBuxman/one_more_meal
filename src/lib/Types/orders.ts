@@ -1,11 +1,10 @@
 import type { Timestamp } from "firebase/firestore";
 import type { Meal } from "./meals";
-import type { UserLocation } from "./location";
 
 export interface Order {
     id: string;
     status: 'ordered' | 'picked_up' | 'completed' | 'cancelled';
-    orderSize: number;
+    order_size: number;
     created_at: number | Timestamp;
     updated_at: number | null | Timestamp;
     completed_at: number | null | Timestamp;

@@ -4,7 +4,7 @@
   import type { MealRecipient } from "$lib/types/meals";
   import { getContext } from "svelte";
   import type { Order } from "$lib/types/orders";
-  import { clampString } from "$lib/Logic/clamp_string";
+  import { clampString } from "$lib/function_utilities/clamp_string";
 
   // Import ShadCN/Svelte Badge component
   import { Badge } from "$lib/components/ui/badge/index";

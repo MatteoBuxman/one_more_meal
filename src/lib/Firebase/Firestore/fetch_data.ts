@@ -1,4 +1,4 @@
-import { reconcileMealsWithRecipientInformation } from "$lib/Logic/reconcile_meals_with_recipient_information";
+import { reconcileMealsWithRecipientInformation } from "$lib/function_utilities/reconcile_meals_with_recipient_information";
 import type {
   Meal,
   MealRecipient,
@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 //Production or Development mode
-import { PUBLIC_PRODUCTION } from "$lib/Logic/production_state";
+import { PUBLIC_PRODUCTION } from "$lib/function_utilities/production_state";
 import { FirebaseError } from "firebase/app";
 import type { UserLocation } from "$lib/types/location";
 
@@ -24,7 +24,7 @@ const parseSnapshotDataAsOrder = (snapshot: QuerySnapshot): Order[] => {
     const order: Order = {
       id: doc.id,
       status: orderData.status,
-      orderSize: orderData.orderSize,
+      order_size: orderData.orderSize,
       created_at: (orderData.created_at as Timestamp).toMillis(),
       updated_at: (orderData.updated_at as Timestamp)
         ? orderData.updated_at.toMillis()

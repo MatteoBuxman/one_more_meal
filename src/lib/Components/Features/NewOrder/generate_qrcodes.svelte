@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from "$lib/components/ui/button/button.svelte";
   import Slider from "$lib/components/ui/slider/slider.svelte";
-  import { PUBLIC_PRODUCTION } from "$lib/Logic/production_state";
+  import { PUBLIC_PRODUCTION } from "$lib/function_utilities/production_state";
   import { Check, Download, LoaderPinwheel } from "lucide-svelte";
 
   let quantity: number = $state(1);

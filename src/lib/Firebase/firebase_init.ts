@@ -17,7 +17,7 @@ import {
 import { getApps, initializeApp } from "firebase/app";
 
 //Production or Development mode
-import { PUBLIC_PRODUCTION } from "$lib/Logic/production_state";
+import { PUBLIC_PRODUCTION } from "$lib/function_utilities/production_state";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries

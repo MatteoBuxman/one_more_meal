@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fetchMealRecipientInfo } from "$lib/firebase/firestore/fetch_data";
-  import { formatDate } from "$lib/Logic/format_date";
+  import { formatDate } from "$lib/function_utilities/format_date";
   import type { Order } from "$lib/types/orders";
   import ViewMealRecipient from "./view_meal_recipient.svelte";
   import LoadingBar from "../../Utilities/loading_bar.svelte";
@@ -76,7 +76,7 @@
 <div class="p-4 border-t border-gray-200">
   <div class="flex justify-between items-center">
     <div class="text-sm text-gray-600">
-      Total Items: {order.orderSize}
+      Total Items: {order.order_size}
     </div>
   </div>
 </div>

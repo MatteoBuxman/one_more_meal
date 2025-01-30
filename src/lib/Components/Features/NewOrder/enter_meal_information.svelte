@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Meal, OneMoreMealPackagingFlowState } from "$lib/types/meals";
+  import type { Meal } from "$lib/types/meals";
   import { getContext } from "svelte";
   import ScanAdditionalMeals from "./scan_additional_meals.svelte";
   import Badge from "$lib/components/ui/badge/badge.svelte";
@@ -8,18 +8,20 @@
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import Slider from "$lib/components/ui/slider/slider.svelte";
+  import type { CurrentOrderState } from "./current_order_provider/current_order_state.svelte";
 
-  let flowState = getContext<OneMoreMealPackagingFlowState>(
-    "add_meal_flow_state"
-  );
+  let currentOrder = getContext<CurrentOrderState>("current_order_state");
 
-  let { ids }: { ids: Array<string> } = $props();
+  let {
+    initital_meal_id,
+    close,
+  }: { initital_meal_id: string; close: () => void } = $props();
 
-  let scanAdditionalMeals = $state(false);
+  let scan_additional_meals = $state(false);
 
-  let mealData = $state<Meal>({
-    firestoreMealID: "eiiebibf8383h",
-    ids,
+  let meal_data = $state<Meal>({
+    firestoreMealID: "",
+    ids: [initital_meal_id],
     name: "",
     description: "",
     quantity: 1,
@@ -28,26 +30,20 @@
   function handleAddMeal(event: Event) {
     event.preventDefault();
 
-    if (mealData.quantity > 1) {
-      scanAdditionalMeals = true;
+    if (meal_data.quantity > 1) {
+      currentOrder.pushToStagingArea(initital_meal_id);
+      scan_additional_meals = true;
       return;
     }
 
-    flowState.addedMeals.push(mealData);
-    flowState.stateIndex = 0;
-  }
-
-  //Handle completion of additional scans
-  function onComplete(IDs: Array<string>) {
-    mealData.ids.push(...IDs);
-    flowState.addedMeals.push(mealData);
-    flowState.stateIndex = 0;
+    currentOrder.pushMeal(meal_data);
+    close();
   }
 </script>
 
 <!-- Form Content -->
 <form class="space-y-6" onsubmit={handleAddMeal}>
-  <Badge variant="outline">Meal #{ids[0]}</Badge>
+  <Badge variant="outline">Meal #{initital_meal_id}</Badge>
 
   <div class="space-y-4">
     <div>
@@ -56,13 +52,12 @@
         class="block text-sm font-medium text-gray-700 mb-1"
       >
         Meal Name
-    </Label>
+      </Label>
       <Input
         id="mealName"
         type="text"
-        
         placeholder="Enter the meal name"
-        bind:value={mealData.name}
+        bind:value={meal_data.name}
         required
       />
     </div>
@@ -76,18 +71,23 @@
       </Label>
       <Textarea
         id="description"
-        
         placeholder="Add a description"
-        bind:value={mealData.description}
+        bind:value={meal_data.description}
       ></Textarea>
     </div>
 
     <div class="w-full">
       <Label for="amount" class="block text-sm font-medium text-gray-700 mb-1">
-        How many {mealData.name  ? mealData.name + 's' : "meals"} ?
+        How many {meal_data.name ? meal_data.name + "s" : "meals"} ?
       </Label>
       <div class="p-3 mx-auto">
-        <Slider type="single" bind:value={mealData.quantity} max={6} min={1} step={1}  />
+        <Slider
+          type="single"
+          bind:value={meal_data.quantity}
+          max={6}
+          min={1}
+          step={1}
+        />
         <div class="flex w-full justify-between text-xs mt-4">
           <span>1</span>
           <span>2</span>
@@ -97,7 +97,7 @@
           <span>6</span>
         </div>
       </div>
-      {#if mealData.quantity > 1}
+      {#if meal_data.quantity > 1}
         <p class="text-xs mt-2 text-gray-500">
           You will be required to scan the QR codes of the additional meals.
         </p>
@@ -105,13 +105,19 @@
     </div>
   </div>
 
-  <Button
-    type="submit"
-    class="w-full"
-  >
-    Add {mealData.quantity} {mealData.name ? mealData.name : mealData.quantity > 1 ? "Meals" : "Meal"}
-</Button>
+  <Button type="submit" class="w-full">
+    Add {meal_data.quantity}
+    {meal_data.name
+      ? meal_data.name
+      : meal_data.quantity > 1
+        ? "Meals"
+        : "Meal"}
+  </Button>
 </form>
 
 <!-- Popup to handle additional scans if there is more than one of a particular meal -->
-<ScanAdditionalMeals bind:isOpen={scanAdditionalMeals} {onComplete} quantity={mealData.quantity} firstID={mealData.ids[0]}/>
+<ScanAdditionalMeals
+  bind:isOpen={scan_additional_meals}
+  meal_data={JSON.parse(JSON.stringify(meal_data))}
+  {close}
+/>

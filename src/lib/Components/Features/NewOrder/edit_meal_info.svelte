@@ -1,17 +1,16 @@
 <script lang="ts">
-  import type { Meal, OneMoreMealPackagingFlowState } from "$lib/types/meals";
+  import type { Meal } from "$lib/types/meals";
   import { getContext } from "svelte";
   import ModalPopupMobile from "../../Utilities/modal_popup_mobile.svelte";
-  import { clampString } from "$lib/Logic/clamp_string";
+  import { clampString } from "$lib/function_utilities/clamp_string";
   import Badge from "$lib/components/ui/badge/badge.svelte";
   import Label from "$lib/components/ui/label/label.svelte";
   import Input from "$lib/components/ui/input/input.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import type { CurrentOrderState } from "./current_order_provider/current_order_state.svelte";
 
-  const contextState = getContext<OneMoreMealPackagingFlowState>(
-    "add_meal_flow_state"
-  );
+  const currentOrder = getContext<CurrentOrderState>("current_order_state");
 
   let {
     isOpen = $bindable(),
@@ -59,7 +58,7 @@
   }
 
   function handleMealUpdate() {
-    const meal = contextState.addedMeals.find(
+    const meal = currentOrder.order.meals.find(
       (meal) => meal.ids[0] === meal_configuration.ids[0]
     ) as Meal;
 
@@ -71,10 +70,12 @@
   }
 
   function handleMealDelete() {
-    const index = contextState.addedMeals.findIndex(
+    const index = currentOrder.order.meals.findIndex(
       (meal) => meal.ids[0] === meal_configuration.ids[0]
     );
-    contextState.addedMeals.splice(index, 1);
+
+    currentOrder.removeMeal(index);
+
     handleClose();
   }
 </script>

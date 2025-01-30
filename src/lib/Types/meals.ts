@@ -9,12 +9,6 @@ export interface Meal {
     quantity: number;
 }
 
-//State object which manages the state of the new meal UI.
-export interface OneMoreMealPackagingFlowState {
-    stateIndex : 0 | 1 | 2;
-    addedMeals : Meal[];
-}
-
 //Interface for the data that is given to the view meal recipient component.
 export interface MealRecipient {
     delivered : boolean;
